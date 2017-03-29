@@ -441,22 +441,13 @@ bool Packet::ParseBuffer(const uint8_t* buffer, size_t size) {
 }
 
 bool Packet::FindExtension(ExtensionType type,
-                           uint8_t length,
+                           uint8_t* length,
                            uint16_t* offset) const {
   RTC_DCHECK(offset);
-  for (const ExtensionInfo& extension : extension_entries_) {
-    if (extension.type == type) {
-      if (extension.length == 0) {
-        // Extension is registered but not set.
-        return false;
-      }
-      if (length != extension.length) {
-        LOG(LS_WARNING) << "Length mismatch for extension '" << type
-                        << "': expected " << static_cast<int>(length)
-                        << ", received " << static_cast<int>(extension.length);
-        return false;
-      }
-      *offset = extension.offset;
+  for (size_t i = 0; i < kMaxExtensionHeaders; ++i) {
+    if (extension_entries_[i].type == type) {
+      *length = extension_entries_[i].length;
+      *offset = extension_entries_[i].offset;
       return true;
     }
   }

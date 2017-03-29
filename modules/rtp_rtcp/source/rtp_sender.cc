@@ -203,6 +203,7 @@ int32_t RTPSender::RegisterRtpHeaderExtension(RTPExtensionType type,
     case kRtpExtensionAbsoluteSendTime:
     case kRtpExtensionAudioLevel:
     case kRtpExtensionTransportSequenceNumber:
+    case kRtpExtensionFrameMarking:
       return rtp_header_extension_map_.Register(type, id);
     case kRtpExtensionNone:
     case kRtpExtensionNumberOfExtensions:

@@ -96,6 +96,11 @@ struct RtpExtension {
   static const char* kPlayoutDelayUri;
   static const int kPlayoutDelayDefaultId;
 
+  // Frame Marking RTP Header Extension
+  // https://tools.ietf.org/html/draft-ietf-avtext-framemarking-04#page-4
+  static const char* kFrameMarkingUri;
+  static const int kFrameMarkingDefaultId;
+
   std::string uri;
   int id;
 };

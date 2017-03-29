@@ -31,7 +31,8 @@ RTPHeaderExtension::RTPHeaderExtension()
       voiceActivity(false),
       audioLevel(0),
       hasVideoRotation(false),
-      videoRotation(kVideoRotation_0) {}
+      videoRotation(kVideoRotation_0),
+      hasFrameMarks(false) {}
 
 RTPHeader::RTPHeader()
     : markerBit(false),

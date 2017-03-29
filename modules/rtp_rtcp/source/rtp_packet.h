@@ -125,11 +125,10 @@ class Packet {
   bool ParseBuffer(const uint8_t* buffer, size_t size);
 
   // Find an extension based on the type field of the parameter.
-  // If found, length field would be validated, the offset field will be set
-  // and true returned,
+  // If found, length and the offset field will be set and true returned,
   // otherwise the parameter will be unchanged and false is returned.
   bool FindExtension(ExtensionType type,
-                     uint8_t length,
+                     uint8_t* length,
                      uint16_t* offset) const;
 
   // Find or allocate an extension, based on the type field of the parameter.
@@ -162,21 +161,24 @@ class Packet {
 template <typename Extension>
 bool Packet::HasExtension() const {
   uint16_t offset = 0;
-  return FindExtension(Extension::kId, Extension::kValueSizeBytes, &offset);
+  uint8_t length = 0;
+  return FindExtension(Extension::kId, &length, &offset);
 }
 
 template <typename Extension, typename... Values>
 bool Packet::GetExtension(Values... values) const {
   uint16_t offset = 0;
-  if (!FindExtension(Extension::kId, Extension::kValueSizeBytes, &offset))
+  uint8_t length = 0;
+  if (!FindExtension(Extension::kId, &length, &offset))
     return false;
-  return Extension::Parse(data() + offset, values...);
+  return Extension::Parse(data() + offset, length, values...);
 }
 
 template <typename Extension, typename... Values>
 bool Packet::SetExtension(Values... values) {
   uint16_t offset = 0;
-  if (!AllocateExtension(Extension::kId, Extension::kValueSizeBytes, &offset))
+  uint8_t length = Extension::GetSize(values...);
+  if (!AllocateExtension(Extension::kId, length, &offset))
     return false;
   return Extension::Write(WriteAt(offset), values...);
 }
@@ -184,9 +186,10 @@ bool Packet::SetExtension(Values... values) {
 template <typename Extension>
 bool Packet::ReserveExtension() {
   uint16_t offset = 0;
-  if (!AllocateExtension(Extension::kId, Extension::kValueSizeBytes, &offset))
+  // Allocate maxium size
+  if (!AllocateExtension(Extension::kId, Extension::kMaxValueSizeBytes, &offset))
     return false;
-  memset(WriteAt(offset), 0, Extension::kValueSizeBytes);
+  memset(WriteAt(offset), 0, Extension::kMaxValueSizeBytes);
   return true;
 }
 }  // namespace rtp

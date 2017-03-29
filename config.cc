@@ -72,6 +72,14 @@ const char* RtpExtension::kPlayoutDelayUri =
     "http://www.webrtc.org/experiments/rtp-hdrext/playout-delay";
 const int RtpExtension::kPlayoutDelayDefaultId = 6;
 
+
+// This extensions provides meta-information about the RTP streams outside the
+// encrypted media payload, an RTP switch can do codec-agnostic
+// selective forwarding without decrypting the payload
+const char* RtpExtension::kFrameMarkingUri =
+    "urn:ietf:params:rtp-hdrext:framemarking";
+const int RtpExtension::kFrameMarkingDefaultId = 7;
+
 bool RtpExtension::IsSupportedForAudio(const std::string& uri) {
   return uri == webrtc::RtpExtension::kAudioLevelUri ||
          uri == webrtc::RtpExtension::kTransportSequenceNumberUri;
@@ -82,7 +90,8 @@ bool RtpExtension::IsSupportedForVideo(const std::string& uri) {
          uri == webrtc::RtpExtension::kAbsSendTimeUri ||
          uri == webrtc::RtpExtension::kVideoRotationUri ||
          uri == webrtc::RtpExtension::kTransportSequenceNumberUri ||
-         uri == webrtc::RtpExtension::kPlayoutDelayUri;
+         uri == webrtc::RtpExtension::kPlayoutDelayUri ||
+         uri == webrtc::RtpExtension::kFrameMarkingUri; 
 }
 
 VideoStream::VideoStream()

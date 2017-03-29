@@ -369,7 +369,51 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
 
     if (!rtp_sender_->AssignSequenceNumber(packet.get()))
       return false;
-
+    
+    // Set Frame Marks
+    FrameMarks frame_marks;
+    bool frame_marking_enabled = false;
+    // Common info
+    frame_marks.startOfFrame = first;
+    frame_marks.endOfFrame = last;
+    frame_marks.independent = (frame_type == kVideoFrameKey);
+    
+    // Codec specific
+    switch (video_type)
+    {
+      case kRtpVideoH264:
+        // Nothing to add
+        frame_marks.discardable = false;
+        frame_marks.temporalLayerId = 0;
+        frame_marks.spatialLayerId = 0;
+        frame_marks.tl0PicIdx = 0;
+        break;
+      case kRtpVideoVp8:
+        frame_marks.discardable = video_header->codecHeader.VP8.nonReference;
+        frame_marks.baseLayerSync = video_header->codecHeader.VP8.layerSync;
+        frame_marks.temporalLayerId = video_header->codecHeader.VP8.temporalIdx;
+        frame_marks.spatialLayerId = 0;
+        frame_marks.tl0PicIdx = video_header->codecHeader.VP8.tl0PicIdx;
+        break;
+      case kRtpVideoVp9:
+        frame_marks.startOfFrame = video_header->codecHeader.VP9.beginning_of_frame;
+        frame_marks.endOfFrame = video_header->codecHeader.VP9.end_of_frame;
+        frame_marks.discardable = false;
+        frame_marks.temporalLayerId = video_header->codecHeader.VP9.temporal_idx;
+        // TODO: Encode U & P bits
+        frame_marks.spatialLayerId = video_header->codecHeader.VP9.spatial_idx;
+        frame_marks.tl0PicIdx = video_header->codecHeader.VP9.tl0_pic_idx;
+        break;
+      default:
+        // Do not use frame marking
+        frame_marking_enabled = false;
+    }
+    
+    // Only add frame marking for known codecs
+    if (frame_marking_enabled)
+        // Add extension header for frame marking
+        packet->SetExtension<FrameMarking>(frame_marks);
+          
     const bool protect_packet =
         (packetizer->GetProtectionType() == kProtectedPacket);
     if (flexfec_enabled()) {

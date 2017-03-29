@@ -30,6 +30,7 @@ const size_t kAbsoluteSendTimeLength = 4;
 const size_t kVideoRotationLength = 2;
 const size_t kTransportSequenceNumberLength = 3;
 const size_t kPlayoutDelayLength = 4;
+const size_t kFrameMarkingLength = 4;
 
 // Playout delay in milliseconds. A playout delay limit (min or max)
 // has 12 bits allocated. This allows a range of 0-4095 values which translates
@@ -48,7 +49,7 @@ class RtpHeaderExtensionMap {
 
   template <typename Extension>
   bool Register(uint8_t id) {
-    return Register(id, Extension::kId, Extension::kValueSizeBytes,
+    return Register(id, Extension::kId, Extension::kMaxValueSizeBytes,
                     Extension::kUri);
   }
   bool RegisterByType(uint8_t id, RTPExtensionType type);

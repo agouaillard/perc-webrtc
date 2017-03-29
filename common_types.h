@@ -766,6 +766,47 @@ struct PlayoutDelay {
   int max_ms;
 };
 
+// For Frame Marking RTP Header Extension:
+// https://tools.ietf.org/html/draft-ietf-avtext-framemarking-04#page-4
+// This extensions provides meta-information about the RTP streams outside the
+// encrypted media payload, an RTP switch can do codec-agnostic
+// selective forwarding without decrypting the payload
+//   o  S: Start of Frame (1 bit) - MUST be 1 in the first packet in a
+//      frame; otherwise MUST be 0.
+//   o  E: End of Frame (1 bit) - MUST be 1 in the last packet in a frame;
+//      otherwise MUST be 0.
+//   o  I: Independent Frame (1 bit) - MUST be 1 for frames that can be
+//      decoded independent of prior frames, e.g. intra-frame, VPX
+//      keyframe, H.264 IDR [RFC6184], H.265 IDR/CRA/BLA/RAP [RFC7798];
+//      otherwise MUST be 0.
+//   o  D: Discardable Frame (1 bit) - MUST be 1 for frames that can be
+//      discarded, and still provide a decodable media stream; otherwise
+//      MUST be 0.
+//   o  B: Base Layer Sync (1 bit) - MUST be 1 if this frame only depends
+//      on the base layer; otherwise MUST be 0.  If no scalability is
+//      used, this MUST be 0.
+//   o  TID: Temporal ID (3 bits) - The base temporal layer starts with 0,
+//      and increases with 1 for each higher temporal layer/sub-layer.  If
+//      no scalability is used, this MUST be 0.
+//   o  LID: Layer ID (8 bits) - Identifies the spatial and quality layer
+//      encoded.  If no scalability is used, this MUST be 0 or omitted.
+//      When omitted, TL0PICIDX MUST also be omitted.
+//   o  TL0PICIDX: Temporal Layer 0 Picture Index (8 bits) - Running index
+//      of base temporal layer 0 frames when TID is 0.  When TID is not 0,
+//      this indicates a dependency on the given index.  If no scalability
+//      is used, this MUST be 0 or omitted.  When omitted, LID MUST also
+//      be omitted.
+struct FrameMarks {
+  bool startOfFrame;
+  bool endOfFrame;
+  bool independent;
+  bool discardable;
+  bool baseLayerSync;
+  uint8_t temporalLayerId;
+  uint8_t spatialLayerId;
+  uint8_t tl0PicIdx;
+};
+
 struct RTPHeaderExtension {
   RTPHeaderExtension();
 
@@ -789,6 +830,11 @@ struct RTPHeaderExtension {
   VideoRotation videoRotation;
 
   PlayoutDelay playout_delay = {-1, -1};
+  
+  // For Frame Marking RTP Header Extension:
+  // https://tools.ietf.org/html/draft-ietf-avtext-framemarking-04#page-4
+  bool hasFrameMarks;
+  FrameMarks frameMarks = { false, false, false, false, false, 0, 0, 0};
 };
 
 struct RTPHeader {
