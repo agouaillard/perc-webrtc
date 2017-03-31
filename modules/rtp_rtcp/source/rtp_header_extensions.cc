@@ -286,9 +286,13 @@ uint8_t FrameMarking::GetSize(const FrameMarks& frame_marks)
 {
   // Check if it is scalable
   if (frame_marks.baseLayerSync
-      || frame_marks.temporalLayerId
-      || frame_marks.spatialLayerId
-      || frame_marks.tl0PicIdx)
+      || (frame_marks.temporalLayerId
+            && frame_marks.temporalLayerId != kNoTemporalIdx)
+      || (frame_marks.spatialLayerId 
+            && frame_marks.spatialLayerId != kNoSpatialIdx)
+      || (frame_marks.tl0PicIdx
+            && frame_marks.tl0PicIdx != (uint8_t)kNoTl0PicIdx)
+  )
     return 3;
   else
     return 1;
@@ -302,9 +306,13 @@ bool FrameMarking::Write(uint8_t* data, const FrameMarks& frame_marks) {
   
   // Check if it is scalable
   if (frame_marks.baseLayerSync
-      || frame_marks.temporalLayerId
-      || frame_marks.spatialLayerId
-      || frame_marks.tl0PicIdx) {
+       || (frame_marks.temporalLayerId 
+            && frame_marks.temporalLayerId != kNoTemporalIdx)
+       || (frame_marks.spatialLayerId
+            && frame_marks.spatialLayerId != kNoSpatialIdx)
+       || (frame_marks.tl0PicIdx 
+            && frame_marks.tl0PicIdx != (uint8_t)kNoTl0PicIdx)
+   ){
     data[0] |= frame_marks.baseLayerSync ? 0x08 : 0x00;
     data[0] |= (frame_marks.temporalLayerId & 0x07);
     data[1] = frame_marks.spatialLayerId;
