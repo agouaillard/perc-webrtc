@@ -87,7 +87,7 @@ TEST(RtpHeaderExtensionTest, GetTotalLength) {
   RtpHeaderExtensionMap map;
   EXPECT_EQ(0u, map.GetTotalLengthInBytes());
   EXPECT_TRUE(map.Register<TransmissionOffset>(3));
-  EXPECT_EQ(kRtpOneByteHeaderLength + (TransmissionOffset::kValueSizeBytes + 1),
+  EXPECT_EQ(kRtpOneByteHeaderLength + (TransmissionOffset::kMaxValueSizeBytes + 1),
             map.GetTotalLengthInBytes());
 }
 
