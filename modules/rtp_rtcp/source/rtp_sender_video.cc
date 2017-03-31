@@ -415,8 +415,6 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
       return false;
     RTC_DCHECK_LE(packet->payload_size(), max_data_payload_length);
 
-    
-     LOG(LS_INFO) << "First " << first << " last " << last;
     // Update star and end marks
     frame_marks.startOfFrame = first;
     frame_marks.endOfFrame = last;
