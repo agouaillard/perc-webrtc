@@ -467,6 +467,7 @@ if (is_linux || is_win) {
       cflags += [
         # Needed to compile on Linux 32-bit.
         "-Wno-sentinel",
+        "-Wno-deprecated-declarations",
       ]
     }
 
@@ -474,7 +475,7 @@ if (is_linux || is_win) {
       # TODO(ehmaldonado): Make peerconnection_client compile with the standard
       # set of warnings.
       # See https://bugs.chromium.org/p/webrtc/issues/detail?id=6306
-      cflags += [ "-Wno-inconsistent-missing-override" ]
+      cflags += [ "-Wno-inconsistent-missing-override" , "-Wno-deprecated-declarations"]
     }
   }
 
