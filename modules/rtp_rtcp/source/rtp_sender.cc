@@ -30,6 +30,7 @@
 #include "webrtc/modules/rtp_rtcp/source/rtp_sender_video.h"
 #include "webrtc/modules/rtp_rtcp/source/time_util.h"
 #include "webrtc/system_wrappers/include/field_trial.h"
+#include "webrtc/system_wrappers/include/logging.h"
 
 namespace webrtc {
 
@@ -1284,6 +1285,8 @@ void RTPSender::UpdateRtpOverhead(const RtpPacketToSend& packet) {
 }
 
 bool RTPSender::EnableDoublePERC(int suite, const uint8_t* key, size_t len) {
+  LOG(LS_INFO) << "Enabling Double PERC Encription";
+  
   rtc::CritScope cs(&send_critsect_);
   double_perc_enabled_ = double_perc_.SetOutboundKey(suite, key, len);
   return  double_perc_enabled_;

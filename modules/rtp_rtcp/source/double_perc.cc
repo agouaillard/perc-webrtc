@@ -37,7 +37,6 @@ DoublePERC::DoublePERC()
 
 DoublePERC::~DoublePERC() {
   if (session_) {
-    srtp_set_user_data(session_, nullptr);
     srtp_dealloc(session_);
   }
 }
@@ -110,7 +109,6 @@ bool DoublePERC::SetKey(int type, int cs, const uint8_t* key, size_t len) {
     return false;
   }
 
-  srtp_set_user_data(session_, this);
   rtp_auth_tag_len_ = policy.rtp.auth_tag_len;
   rtcp_auth_tag_len_ = policy.rtcp.auth_tag_len;
   return true;

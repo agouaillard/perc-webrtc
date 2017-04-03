@@ -468,6 +468,9 @@ void RtpReceiverImpl::CheckCSRC(const WebRtcRTPHeader& rtp_header) {
 }
 
 bool RtpReceiverImpl::EnableDoublePERC(int suite, const uint8_t* key, size_t len) {
+  
+  LOG(LS_INFO) << "Enabling Double PERC Encription";
+  
   rtc::CritScope cs(&critical_section_rtp_receiver_);
   double_perc_enabled_ = double_perc_.SetInboundKey(suite, key, len);
   return  double_perc_enabled_;
