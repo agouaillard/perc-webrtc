@@ -800,6 +800,24 @@ void SrtpSession::HandleEventThunk(srtp_event_data_t* ev) {
       srtp_get_user_data(ev->session));
   if (session) {
     session->HandleEvent(ev);
+  } else {
+    switch (ev->event) {
+      case event_ssrc_collision:
+        LOG(LS_INFO) << "SRTP event: SSRC collision";
+        break;
+      case event_key_soft_limit:
+        LOG(LS_INFO) << "SRTP event: reached soft key usage limit";
+        break;
+      case event_key_hard_limit:
+        LOG(LS_INFO) << "SRTP event: reached hard key usage limit";
+        break;
+      case event_packet_index_limit:
+        LOG(LS_INFO) << "SRTP event: reached hard packet limit (2^48 packets)";
+        break;
+      default:
+        LOG(LS_INFO) << "SRTP event: unknown " << ev->event;
+        break;
+    }
   }
 }
 
