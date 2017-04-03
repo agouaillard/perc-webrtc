@@ -962,8 +962,8 @@ Channel::Channel(int32_t channelId,
       statistics_proxy_.get());
   
   //TODO(sergio): Make this dinamyc
-  const char* key = "THIS IS THE 32 KEY WITH 16 SALT FOR DOUBLE PERC";
-  rtp_receiver_->EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(const uint8_t*)key,48);
+  const char* key = "THIS IS THE 32 KEY WITH 12 SALT FOR DOUBLE PERC";
+  rtp_receiver_->EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(const uint8_t*)key,44);
 }
 
 Channel::~Channel() {

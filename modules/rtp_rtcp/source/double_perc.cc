@@ -159,16 +159,17 @@ bool DoublePERC::UnprotectRtp(void* p, int in_len, int* out_len) {
 bool DoublePERC::Encrypt(rtp::Packet *packet)
 {
   // Calculate payload size for encrypted version
-  size_t size = ohb_size + packet->payload_size() + rtp_auth_tag_len_;
+  size_t encrypted_payload_size = ohb_size + packet->payload_size() + rtp_auth_tag_len_;
   
   //Check it is enought
-  if (size>packet->MaxPayloadSize()) {
+  if (encrypted_payload_size > packet->MaxPayloadSize()) {
     LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"
       << " encrypted size wille exceed max payload size available";
     return false;
   }
   // Alloc temporal buffer for encryption
-  uint8_t* inner = (uint8_t*) malloc(size + 1);
+  size_t size = encrypted_payload_size + 1;
+  uint8_t* inner = (uint8_t*) malloc(size);
   const uint8_t* data = packet->data();
   
   // Innert RTP packet has no padding,csrcs or extensions
@@ -194,7 +195,7 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
       // Copy the encrypted inner rtp packet except first byte  of rtp header
       memcpy(buffer, inner + 1, out_len - 1);
       // Set new payload size
-      packet->SetPayloadSize(out_len - ohb_size);
+      packet->SetPayloadSize(out_len - 1);
     } else {
         LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"
           << " could not allocate payload for encrypted data";
@@ -222,7 +223,7 @@ bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
    // Reconstruct RTP header
   inner[0] = 0x80;
   // Copy the rest of the header
-  memcpy(inner+1, payload, *payload_length);
+  memcpy(inner + 1, payload, *payload_length);
   
   // UnProtect inner rtp packet
   int out_length;
@@ -234,7 +235,8 @@ bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
     // Remove the OHB data
     *payload_length = out_length - ohb_size;
     // Copy the encrypted inner rtp packet except first byte  of rtp header
-    memcpy(payload, inner + ohb_size, *payload_length);
+    memcpy(payload, inner + ohb_size + 1, *payload_length);
+    LOG(LS_WARNING) << " DOUBLE PERC OK";
   } else {
       LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"
         << " could not allocate payload for decrypted data";

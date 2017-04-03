@@ -130,8 +130,8 @@ ModuleRtpRtcpImpl::ModuleRtpRtcpImpl(const Configuration& configuration)
   SetMaxRtpPacketSize(IP_PACKET_SIZE - kTcpOverIpv4HeaderSize);
   
   //TODO(sergio): Make this dinamyc
-  const char* key = "THIS IS THE 32 KEY WITH 16 SALT FOR DOUBLE PERC";
-  rtp_sender_.EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(uint8_t*)key,48);
+  const char* key = "THIS IS THE 32 KEY WITH 12 SALT FOR DOUBLE PERC";
+  rtp_sender_.EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(uint8_t*)key,44);
 }
 
 // Returns the number of milliseconds until the module want a worker thread

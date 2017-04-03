@@ -35,6 +35,7 @@ namespace cricket {
 class SrtpSession;
 class SrtpStat;
 
+void InitializeSrtp();
 void ShutdownSrtp();
 
 // Class to transform SRTP to/from RTP.
@@ -210,6 +211,7 @@ class SrtpSession {
   void set_signal_silent_time(int signal_silent_time_in_ms);
 
   // Calls srtp_shutdown if it's initialized.
+  static bool Init();
   static void Terminate();
 
   sigslot::repeater3<uint32_t, SrtpFilter::Mode, SrtpFilter::Error>
@@ -220,7 +222,6 @@ class SrtpSession {
     // Returns send stream current packet index from srtp db.
   bool GetSendStreamPacketIndex(void* data, int in_len, int64_t* index);
 
-  static bool Init();
   void HandleEvent(const srtp_event_data_t* ev);
   static void HandleEventThunk(srtp_event_data_t* ev);
 

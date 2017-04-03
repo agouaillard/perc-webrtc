@@ -41,6 +41,12 @@ bool SrtpNotAvailable(const char *func) {
 
 #endif  // !HAVE_SRTP
 
+void InitializeSrtp() {
+#ifdef HAVE_SRTP
+  SrtpSession::Init();
+#endif
+}
+
 // NOTE: This is called from ChannelManager D'tor.
 void ShutdownSrtp() {
 #ifdef HAVE_SRTP
