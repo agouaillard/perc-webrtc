@@ -28,7 +28,6 @@
 #include "webrtc/pc/externalhmac.h"
 
 namespace cricket {
-
 #ifndef HAVE_SRTP
 
 // This helper function is used on systems that don't (yet) have SRTP,

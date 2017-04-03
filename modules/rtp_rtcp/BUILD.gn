@@ -21,6 +21,8 @@ rtc_static_library("rtp_rtcp") {
     "include/rtp_rtcp_defines.h",
     "include/ulpfec_receiver.h",
     "source/byte_io.h",
+    "source/double_perc.cc",
+    "source/double_perc.h",
     "source/dtmf_queue.cc",
     "source/dtmf_queue.h",
     "source/fec_private_tables_bursty.h",
@@ -184,6 +186,10 @@ rtc_static_library("rtp_rtcp") {
     "../remote_bitrate_estimator",
   ]
 
+  if (rtc_build_libsrtp) {
+    deps += [ "//third_party/libsrtp" ]
+  }
+
   # TODO(jschuh): Bug 1348: fix this warning.
   configs += [ "//build/config/compiler:no_size_t_to_int_warning" ]
 
@@ -203,6 +209,8 @@ if (rtc_include_tests) {
       "test/testFec/average_residual_loss_xor_codes.h",
       "test/testFec/test_packet_masks_metrics.cc",
     ]
+
+    include_dirs = [ "//third_party/libsrtp/srtp" ]
 
     deps = [
       ":rtp_rtcp",

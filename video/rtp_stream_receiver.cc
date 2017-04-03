@@ -15,6 +15,7 @@
 
 #include "webrtc/base/checks.h"
 #include "webrtc/base/logging.h"
+#include "webrtc/base/sslstreamadapter.h"
 #include "webrtc/common_types.h"
 #include "webrtc/config.h"
 #include "webrtc/media/base/mediaconstants.h"
@@ -211,6 +212,10 @@ RtpStreamReceiver::RtpStreamReceiver(
         clock_, kPacketBufferStartSize, kPacketBufferMaxSixe, this);
     reference_finder_.reset(new video_coding::RtpFrameReferenceFinder(this));
   }
+  
+  //TODO(sergio): Make this dinamyc
+  const char* key = "THIS IS THE 32 KEY WITH 16 SALT FOR DOUBLE PERC";
+  rtp_receiver_->EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(const uint8_t*)key,48);
 }
 
 RtpStreamReceiver::~RtpStreamReceiver() {

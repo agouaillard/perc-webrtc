@@ -1283,4 +1283,17 @@ void RTPSender::UpdateRtpOverhead(const RtpPacketToSend& packet) {
   overhead_observer_->OnOverheadChanged(overhead_bytes_per_packet);
 }
 
+bool RTPSender::EnableDoublePERC(int suite, const uint8_t* key, size_t len) {
+  rtc::CritScope cs(&send_critsect_);
+  double_perc_enabled_ = double_perc_.SetOutboundKey(suite, key, len);
+  return  double_perc_enabled_;
+}
+
+bool RTPSender::DoubleEncrypt(rtp::Packet *packet)
+{
+  if (double_perc_enabled_)
+    return double_perc_.Encrypt(packet);
+  return true;
+}
+
 }  // namespace webrtc

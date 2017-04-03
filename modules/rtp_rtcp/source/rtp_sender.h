@@ -27,6 +27,7 @@
 #include "webrtc/common_types.h"
 #include "webrtc/modules/rtp_rtcp/include/flexfec_sender.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include "webrtc/modules/rtp_rtcp/source/double_perc.h"
 #include "webrtc/modules/rtp_rtcp/source/playout_delay_oracle.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_header_extension.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_packet_history.h"
@@ -209,6 +210,10 @@ class RTPSender {
   void SetRtxRtpState(const RtpState& rtp_state);
   RtpState GetRtxRtpState() const;
 
+  // Double PERC stuff
+  bool EnableDoublePERC(int suite, const uint8_t* key, size_t len);
+  bool DoubleEncrypt(rtp::Packet *packet);
+  
  protected:
   int32_t CheckPayloadType(int8_t payload_type, RtpVideoCodecTypes* video_type);
 
@@ -327,6 +332,10 @@ class RTPSender {
   RateLimiter* const retransmission_rate_limiter_;
   OverheadObserver* overhead_observer_;
 
+  // Double PERC encryption
+  bool double_perc_enabled_;
+  DoublePERC double_perc_;
+  
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(RTPSender);
 };
 

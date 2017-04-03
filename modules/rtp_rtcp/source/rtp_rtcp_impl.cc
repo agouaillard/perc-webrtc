@@ -17,6 +17,7 @@
 
 #include "webrtc/base/checks.h"
 #include "webrtc/base/logging.h"
+#include "webrtc/base/sslstreamadapter.h"
 #include "webrtc/common_types.h"
 #include "webrtc/config.h"
 #include "webrtc/system_wrappers/include/trace.h"
@@ -127,6 +128,10 @@ ModuleRtpRtcpImpl::ModuleRtpRtcpImpl(const Configuration& configuration)
   // webrtc::VideoSendStream::Config::Rtp::kDefaultMaxPacketSize.
   const size_t kTcpOverIpv4HeaderSize = 40;
   SetMaxRtpPacketSize(IP_PACKET_SIZE - kTcpOverIpv4HeaderSize);
+  
+  //TODO(sergio): Make this dinamyc
+  const char* key = "THIS IS THE 32 KEY WITH 16 SALT FOR DOUBLE PERC";
+  rtp_sender_.EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(uint8_t*)key,48);
 }
 
 // Returns the number of milliseconds until the module want a worker thread

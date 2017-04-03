@@ -20,6 +20,7 @@
 #include "webrtc/base/format_macros.h"
 #include "webrtc/base/logging.h"
 #include "webrtc/base/rate_limiter.h"
+#include "webrtc/base/sslstreamadapter.h"
 #include "webrtc/base/thread_checker.h"
 #include "webrtc/base/timeutils.h"
 #include "webrtc/config.h"
@@ -959,6 +960,10 @@ Channel::Channel(int32_t channelId,
   statistics_proxy_.reset(new StatisticsProxy(_rtpRtcpModule->SSRC()));
   rtp_receive_statistics_->RegisterRtcpStatisticsCallback(
       statistics_proxy_.get());
+  
+  //TODO(sergio): Make this dinamyc
+  const char* key = "THIS IS THE 32 KEY WITH 16 SALT FOR DOUBLE PERC";
+  rtp_receiver_->EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(const uint8_t*)key,48);
 }
 
 Channel::~Channel() {

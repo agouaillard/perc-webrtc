@@ -414,6 +414,10 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
     if (!packetizer->NextPacket(packet.get(), &last))
       return false;
     RTC_DCHECK_LE(packet->payload_size(), max_data_payload_length);
+    
+    // Double PERC
+    if (!rtp_sender_->DoubleEncrypt(packet.get()))
+      return false;
 
     // Update star and end marks
     frame_marks.startOfFrame = first;

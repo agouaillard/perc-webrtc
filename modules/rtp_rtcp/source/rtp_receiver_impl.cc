@@ -173,9 +173,15 @@ bool RtpReceiverImpl::IncomingRtpPacket(
       is_first_packet_in_frame = true;
     }
   }
+  
+  if (double_perc_enabled_) {
+    if (!double_perc_.Decrypt((uint8_t*)payload,&payload_data_length))
+      return false;
+  }
+    
 
   int32_t ret_val = rtp_media_receiver_->ParseRtpPacket(
-      &webrtc_rtp_header, payload_specific, is_red, payload, payload_length,
+      &webrtc_rtp_header, payload_specific, is_red, payload, payload_data_length,
       clock_->TimeInMilliseconds(), is_first_packet_in_frame);
 
   if (ret_val < 0) {
@@ -461,4 +467,9 @@ void RtpReceiverImpl::CheckCSRC(const WebRtcRTPHeader& rtp_header) {
   }
 }
 
+bool RtpReceiverImpl::EnableDoublePERC(int suite, const uint8_t* key, size_t len) {
+  rtc::CritScope cs(&critical_section_rtp_receiver_);
+  double_perc_enabled_ = double_perc_.SetInboundKey(suite, key, len);
+  return  double_perc_enabled_;
+}
 }  // namespace webrtc

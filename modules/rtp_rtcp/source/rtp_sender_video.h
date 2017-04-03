@@ -80,7 +80,7 @@ class RTPSenderVideo {
 
   int SelectiveRetransmissions() const;
   void SetSelectiveRetransmissions(uint8_t settings);
-
+  
  private:
   size_t CalculateFecPacketOverhead() const EXCLUSIVE_LOCKS_REQUIRED(crit_);
 

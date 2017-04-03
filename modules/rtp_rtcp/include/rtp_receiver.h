@@ -89,6 +89,9 @@ class RtpReceiver {
 
   // Returns the current energy of the RTP stream received.
   virtual int32_t Energy(uint8_t array_of_energy[kRtpCsrcSize]) const = 0;
+  
+// Double PERC stuff
+  virtual bool EnableDoublePERC(int suite, const uint8_t* key, size_t len) = 0;
 };
 }  // namespace webrtc
 

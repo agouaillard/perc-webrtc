@@ -16,6 +16,7 @@
 #include "webrtc/base/criticalsection.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_receiver.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include "webrtc/modules/rtp_rtcp/source/double_perc.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_receiver_strategy.h"
 #include "webrtc/typedefs.h"
 
@@ -55,6 +56,9 @@ class RtpReceiverImpl : public RtpReceiver {
   int32_t Energy(uint8_t array_of_energy[kRtpCsrcSize]) const override;
 
   TelephoneEventHandler* GetTelephoneEventHandler() override;
+  
+  // Double PERC stuff
+  bool EnableDoublePERC(int suite, const uint8_t* key, size_t len) override;
 
  private:
   bool HaveReceivedFrame() const;
@@ -84,6 +88,10 @@ class RtpReceiverImpl : public RtpReceiver {
   uint32_t last_received_timestamp_;
   int64_t last_received_frame_time_ms_;
   uint16_t last_received_sequence_number_;
+  
+  // Double PERC encryption
+  bool double_perc_enabled_;
+  DoublePERC double_perc_;
 };
 }  // namespace webrtc
 #endif  // WEBRTC_MODULES_RTP_RTCP_SOURCE_RTP_RECEIVER_IMPL_H_
