@@ -55,14 +55,16 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
                                          const uint8_t* payload,
                                          size_t payload_length,
                                          int64_t timestamp_ms,
-                                         bool is_first_packet) {
+                                         bool is_first_packet,
+                                         bool is_double_enabled,
+                                         DoublePERC *double_perc) {
   TRACE_EVENT2(TRACE_DISABLED_BY_DEFAULT("webrtc_rtp"), "Video::ParseRtp",
                "seqnum", rtp_header->header.sequenceNumber, "timestamp",
                rtp_header->header.timestamp);
   rtp_header->type.Video.codec = specific_payload.Video.videoCodecType;
 
   RTC_DCHECK_GE(payload_length, rtp_header->header.paddingLength);
-  const size_t payload_data_length =
+  size_t payload_data_length =
       payload_length - rtp_header->header.paddingLength;
 
   if (payload == NULL || payload_data_length == 0) {
@@ -80,6 +82,13 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
   if (depacketizer.get() == NULL) {
     LOG(LS_ERROR) << "Failed to create depacketizer.";
     return -1;
+  }
+  
+  if (is_double_enabled) {
+    LOG(LS_ERROR) << ">VIDEO " << payload_data_length <<" PT "<< ((uint32_t)rtp_header->header.payloadType);
+    if (!double_perc->Decrypt((uint8_t*)payload, &payload_data_length))
+      return -1;
+    LOG(LS_ERROR) << "<VIDEO " << payload_data_length;
   }
 
   rtp_header->type.Video.is_first_packet_in_frame = is_first_packet;

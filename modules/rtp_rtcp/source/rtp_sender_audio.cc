@@ -242,13 +242,13 @@ bool RTPSenderAudio::SendAudio(FrameType frame_type,
     memcpy(payload, payload_data, payload_size);
   }
 
+  if (!rtp_sender_->AssignSequenceNumber(packet.get()))
+    return false;
+
   // Double PERC
   if (!rtp_sender_->DoubleEncrypt(packet.get()))
     return false;
   
-  if (!rtp_sender_->AssignSequenceNumber(packet.get()))
-    return false;
-
   {
     rtc::CritScope cs(&send_audio_critsect_);
     last_payload_type_ = payload_type;

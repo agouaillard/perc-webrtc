@@ -134,7 +134,9 @@ int32_t RTPReceiverAudio::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
                                          const uint8_t* payload,
                                          size_t payload_length,
                                          int64_t timestamp_ms,
-                                         bool is_first_packet) {
+                                         bool is_first_packet,
+                                         bool is_double_enabled,
+                                         DoublePERC *double_perc) {
   TRACE_EVENT2(TRACE_DISABLED_BY_DEFAULT("webrtc_rtp"), "Audio::ParseRtp",
                "seqnum", rtp_header->header.sequenceNumber, "timestamp",
                rtp_header->header.timestamp);
@@ -155,7 +157,9 @@ int32_t RTPReceiverAudio::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
                                  payload,
                                  payload_length,
                                  specific_payload.Audio,
-                                 is_red);
+                                 is_red,
+                                 is_double_enabled,
+                                 double_perc);
 }
 
 RTPAliveType RTPReceiverAudio::ProcessDeadOrAlive(
@@ -211,7 +215,9 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
     const uint8_t* payload_data,
     size_t payload_length,
     const AudioPayload& audio_specific,
-    bool is_red) {
+    bool is_red,
+    bool is_double_enabled,
+		DoublePERC *double_perc) {
 
   if (payload_length == 0) {
     return 0;
@@ -294,12 +300,28 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
   if (is_red && !(payload_data[0] & 0x80)) {
     // we recive only one frame packed in a RED packet remove the RED wrapper
     rtp_header->header.payloadType = payload_data[0];
-
+      
+    if (is_double_enabled) {
+      size_t len = payload_length - 1;
+       LOG(LS_ERROR) << ">AUDIO RED"<<payload_length;
+      if (!double_perc->Decrypt((uint8_t*)payload_data, &len))
+        return -1;
+      payload_length = len + 1;
+      LOG(LS_ERROR) << "<AUDIO RED"<<payload_length;
+    }
+    
     // only one frame in the RED strip the one byte to help NetEq
     return data_callback_->OnReceivedPayloadData(
         payload_data + 1, payload_length - 1, rtp_header);
   }
-
+  
+  if (is_double_enabled) {
+    LOG(LS_ERROR) << ">AUDIO " << payload_length;
+    if (!double_perc->Decrypt((uint8_t*)payload_data, &payload_length))
+      return -1;
+    LOG(LS_ERROR) << "<AUDIO " << payload_length;
+  }
+    
   rtp_header->type.Audio.channel = audio_specific.channels;
   return data_callback_->OnReceivedPayloadData(
       payload_data, payload_length, rtp_header);

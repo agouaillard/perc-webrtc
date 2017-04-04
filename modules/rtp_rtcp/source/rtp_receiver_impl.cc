@@ -173,16 +173,11 @@ bool RtpReceiverImpl::IncomingRtpPacket(
       is_first_packet_in_frame = true;
     }
   }
-  
-  if (double_perc_enabled_) {
-    if (!double_perc_.Decrypt((uint8_t*)payload,&payload_data_length))
-      return false;
-  }
-    
 
   int32_t ret_val = rtp_media_receiver_->ParseRtpPacket(
       &webrtc_rtp_header, payload_specific, is_red, payload, payload_data_length,
-      clock_->TimeInMilliseconds(), is_first_packet_in_frame);
+      clock_->TimeInMilliseconds(), is_first_packet_in_frame,
+      double_perc_enabled_, &double_perc_);
 
   if (ret_val < 0) {
     return false;

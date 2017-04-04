@@ -22,10 +22,12 @@
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *  |M|     PT      |       sequence number         |  timestamp    |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *  |                  timestamp                    |
+ *  |                  timestamp                    |  SSRC         |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |                  SSRC(cont                    |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-static size_t ohb_size = 7;
+static size_t ohb_size = 11;
 
 namespace webrtc {
   
@@ -173,14 +175,40 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
   // Alloc temporal buffer for encryption
   size_t size = encrypted_payload_size + 1;
   uint8_t* inner = (uint8_t*) malloc(size);
-  const uint8_t* data = packet->data();
+  
+  //Get packet values
+  bool mark = packet->Marker ();
+  uint8_t pt = packet->PayloadType ();
+  uint16_t seq = packet->SequenceNumber();
+  uint32_t ts = packet->Timestamp();
+  uint32_t ssrc = packet->Ssrc();
   
   // Innert RTP packet has no padding,csrcs or extensions
   inner[0] = 0x80;
-  // Copy the rest of the header
-  memcpy(inner + 1, data + 1, ohb_size);
+  
+  // marker & pt
+  inner[1] = mark ? 0x80 | pt : pt;
+  //SEQ
+  inner[2] = seq >> 8;
+  inner[3] = seq;
+  // TS
+  inner[4] = ts >> 24;
+  inner[5] = ts >> 16;
+  inner[6] = ts >> 8;
+  inner[7] = ts;
+  // SSRC
+  inner[8] = ssrc >> 24;
+  inner[9] = ssrc >> 16;
+  inner[10] = ssrc >> 8;
+  inner[11] = ssrc;
+  
   //Copy the rest of the payload
   memcpy(inner + 1 + ohb_size, packet->payload().data(), packet->payload_size());
+
+  LOG(LS_WARNING) << ">Encrypt "  << packet->payload_size()
+    << " seq " << packet->SequenceNumber () 
+    << " ts  " << packet->Timestamp () 
+    << " ssrc" << packet->Ssrc ();
   
   // Protect inner rtp packet
   int out_len;
@@ -188,7 +216,10 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
                            1 + ohb_size + packet->payload_size(),
                            size,
                            &out_len);
-  
+  LOG(LS_WARNING) << "<Encrypt " << out_len 
+    << " seq " << (((uint32_t)(inner[2]))<<8 | inner[3])
+    << " ts  " << (((uint32_t)(inner[4]))<<24 | ((uint32_t)(inner[5]))<<16 | ((uint32_t)(inner[6]))<<8 | ((uint32_t)(inner[7])))
+    << " ssrc" << (((uint32_t)(inner[8]))<<24 | ((uint32_t)(inner[9]))<<16 | ((uint32_t)(inner[10]))<<8 | ((uint32_t)(inner[11])));
   //Set encrypted payload
   if (result) {
     // Allocate new payload size
@@ -228,18 +259,23 @@ bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
   // Copy the rest of the header
   memcpy(inner + 1, payload, *payload_length);
   
+  LOG(LS_WARNING) << ">Decrypt " << *payload_length
+    << " seq " << (((uint32_t)(inner[2]))<<8 | inner[3])
+    << " ts  " << (((uint32_t)(inner[4]))<<24 | ((uint32_t)(inner[5]))<<16 | ((uint32_t)(inner[6]))<<8 | ((uint32_t)(inner[7])))
+    << " ssrc" << (((uint32_t)(inner[8]))<<24 | ((uint32_t)(inner[9]))<<16 | ((uint32_t)(inner[10]))<<8 | ((uint32_t)(inner[11])));
   // UnProtect inner rtp packet
   int out_length;
   bool result = UnprotectRtp(inner,
                            1 + *payload_length,
                            &out_length);
+  
+   LOG(LS_WARNING) << "<Decrypt" << out_length;
  //Set decyrpted payload
   if (result) {
     // Remove the OHB data
     *payload_length = out_length - ohb_size - 1;
     // Copy the encrypted inner rtp packet except first byte  of rtp header
     memcpy(payload, inner + ohb_size + 1, *payload_length);
-    LOG(LS_WARNING) << " DOUBLE PERC OK";
   } else {
       LOG(LS_WARNING) << "Failed to perform DOUBLE PERC";
       result = false;
