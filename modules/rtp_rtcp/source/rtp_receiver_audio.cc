@@ -314,10 +314,8 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
   }
   
   if (is_double_enabled) {
-    LOG(LS_ERROR) << ">AUDIO " << payload_length;
     if (!double_perc->Decrypt((uint8_t*)payload_data, &payload_length))
       return -1;
-    LOG(LS_ERROR) << "<AUDIO " << payload_length;
   }
     
   rtp_header->type.Audio.channel = audio_specific.channels;
