@@ -85,10 +85,8 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
   }
   
   if (is_double_enabled) {
-    LOG(LS_ERROR) << ">VIDEO " << payload_data_length <<" PT "<< ((uint32_t)rtp_header->header.payloadType);
     if (!double_perc->Decrypt((uint8_t*)payload, &payload_data_length))
       return -1;
-    LOG(LS_ERROR) << "<VIDEO " << payload_data_length;
   }
 
   rtp_header->type.Video.is_first_packet_in_frame = is_first_packet;

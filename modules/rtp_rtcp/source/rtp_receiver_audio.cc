@@ -303,11 +303,9 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
       
     if (is_double_enabled) {
       size_t len = payload_length - 1;
-       LOG(LS_ERROR) << ">AUDIO RED"<<payload_length;
       if (!double_perc->Decrypt((uint8_t*)payload_data, &len))
         return -1;
       payload_length = len + 1;
-      LOG(LS_ERROR) << "<AUDIO RED"<<payload_length;
     }
     
     // only one frame in the RED strip the one byte to help NetEq
