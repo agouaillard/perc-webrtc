@@ -16,6 +16,53 @@
 #include "webrtc/modules/rtp_rtcp/source/double_perc.h"
 #include "webrtc/base/sslstreamadapter.h"
 
+inline char PC(uint8_t b)
+{
+	if (b>32&&b<128)
+		return b;
+	else
+		return '.';
+}
+inline void Debug(const char *msg, ...)
+{
+		va_list ap;
+		va_start(ap, msg);
+		vprintf(msg, ap);
+		va_end(ap);
+		fflush(stdout);
+}
+
+inline void Dump(const uint8_t *data,uint32_t size)
+{
+	for(uint32_t i=0;i<(size/8);i++)
+		Debug("[%.4x] [0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   %c%c%c%c%c%c%c%c]\n",8*i,data[8*i],data[8*i+1],data[8*i+2],data[8*i+3],data[8*i+4],data[8*i+5],data[8*i+6],data[8*i+7],PC(data[8*i]),PC(data[8*i+1]),PC(data[8*i+2]),PC(data[8*i+3]),PC(data[8*i+4]),PC(data[8*i+5]),PC(data[8*i+6]),PC(data[8*i+7]));
+	switch(size%8)
+	{
+		case 1:
+			Debug("[%.4x] [0x%.2x                                                    %c       ]\n",size-1,data[size-1],PC(data[size-1]));
+			break;
+		case 2:
+			Debug("[%.4x] [0x%.2x   0x%.2x                                             %c%c      ]\n",size-2,data[size-2],data[size-1],PC(data[size-2]),PC(data[size-1]));
+			break;
+		case 3:
+			Debug("[%.4x] [0x%.2x   0x%.2x   0x%.2x                                      %c%c%c     ]\n",size-3,data[size-3],data[size-2],data[size-1],PC(data[size-3]),PC(data[size-2]),PC(data[size-1]));
+			break;
+		case 4:
+			Debug("[%.4x] [0x%.2x   0x%.2x   0x%.2x   0x%.2x                               %c%c%c%c    ]\n",size-4,data[size-4],data[size-3],data[size-2],data[size-1],PC(data[size-4]),PC(data[size-3]),PC(data[size-2]),PC(data[size-1]));
+			break;
+		case 5:
+			Debug("[%.4x] [0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x                        %c%c%c%c%c   ]\n",size-5,data[size-5],data[size-4],data[size-3],data[size-2],data[size-1],PC(data[size-5]),PC(data[size-4]),PC(data[size-3]),PC(data[size-2]),PC(data[size-1]));
+			break;
+		case 6:
+			Debug("[%.4x] [0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x                 %c%c%c%c%c%c  ]\n",size-6,data[size-6],data[size-5],data[size-4],data[size-3],data[size-2],data[size-1],PC(data[size-6]),PC(data[size-5]),PC(data[size-4]),PC(data[size-3]),PC(data[size-2]),PC(data[size-1]));
+			break;
+		case 7:
+			Debug("[%.4x] [0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x   0x%.2x          %c%c%c%c%c%c%c ]\n",size-7,data[size-7],data[size-6],data[size-5],data[size-4],data[size-3],data[size-2],data[size-1],PC(data[size-7]),PC(data[size-6]),PC(data[size-5]),PC(data[size-4]),PC(data[size-3]),PC(data[size-2]),PC(data[size-1]));
+			break;
+	}
+}
+
+
 /* OHB data
  *   0                   1                   2                   3
  *   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -209,7 +256,8 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
     << " seq " << packet->SequenceNumber () 
     << " ts  " << packet->Timestamp () 
     << " ssrc" << packet->Ssrc ();
-  
+  Dump(packet->payload().data(),16);
+  Dump(inner,32);
   // Protect inner rtp packet
   int out_len;
   bool result = ProtectRtp(inner,
@@ -220,6 +268,8 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
     << " seq " << (((uint32_t)(inner[2]))<<8 | inner[3])
     << " ts  " << (((uint32_t)(inner[4]))<<24 | ((uint32_t)(inner[5]))<<16 | ((uint32_t)(inner[6]))<<8 | ((uint32_t)(inner[7])))
     << " ssrc" << (((uint32_t)(inner[8]))<<24 | ((uint32_t)(inner[9]))<<16 | ((uint32_t)(inner[10]))<<8 | ((uint32_t)(inner[11])));
+  Dump(inner,32);
+  
   //Set encrypted payload
   if (result) {
     // Allocate new payload size
@@ -236,7 +286,7 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
         result = false;
     }
   }
-  
+  Dump(packet->payload().data(),16);
   //Free aux
   free(inner);
   
@@ -263,6 +313,8 @@ bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
     << " seq " << (((uint32_t)(inner[2]))<<8 | inner[3])
     << " ts  " << (((uint32_t)(inner[4]))<<24 | ((uint32_t)(inner[5]))<<16 | ((uint32_t)(inner[6]))<<8 | ((uint32_t)(inner[7])))
     << " ssrc" << (((uint32_t)(inner[8]))<<24 | ((uint32_t)(inner[9]))<<16 | ((uint32_t)(inner[10]))<<8 | ((uint32_t)(inner[11])));
+  Dump(payload,16);
+  Dump(inner,16);
   // UnProtect inner rtp packet
   int out_length;
   bool result = UnprotectRtp(inner,
@@ -280,7 +332,9 @@ bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
       LOG(LS_WARNING) << "Failed to perform DOUBLE PERC";
       result = false;
   }
-  
+  Dump(inner,16);
+  Dump(payload,16);
+ 
   //Free aux
   free(inner);
   

@@ -445,8 +445,8 @@ void RtpHeaderParser::ParseOneByteExtensionHeader(
           break;
         }
         case kRtpExtensionFrameMarking: {
-          if (len != 1 && len != 3) {
-            LOG(LS_WARNING) << "Incorrect playout delay len: " << len;
+          if (len != 0 && len != 2) {
+            LOG(LS_WARNING) << "Incorrect frame marking len: " << len;
             return;
           }
           // For Frame Marking RTP Header Extension:
