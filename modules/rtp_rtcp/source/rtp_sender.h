@@ -213,6 +213,7 @@ class RTPSender {
   // Double PERC stuff
   bool EnableDoublePERC(int suite, const uint8_t* key, size_t len);
   bool DoubleEncrypt(rtp::Packet *packet);
+  size_t GetDoubleEncryptionOverhead();
   
  protected:
   int32_t CheckPayloadType(int8_t payload_type, RtpVideoCodecTypes* video_type);

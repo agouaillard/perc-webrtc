@@ -31,6 +31,8 @@ class DoublePERC {
   bool Encrypt(rtp::Packet *packet);
   bool Decrypt(uint8_t* payload,size_t* payload_length);
   
+  size_t GetEncryptionOverhead();
+  
  private:
   bool SetKey(int type, int cs, const uint8_t* key, size_t len);
   bool ProtectRtp(void* data, int in_len, int max_len, int* out_len);

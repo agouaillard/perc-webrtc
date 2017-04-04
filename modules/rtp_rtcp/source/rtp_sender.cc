@@ -1298,5 +1298,10 @@ bool RTPSender::DoubleEncrypt(rtp::Packet *packet)
     return double_perc_.Encrypt(packet);
   return true;
 }
-
+size_t RTPSender::GetDoubleEncryptionOverhead()
+{
+ if (double_perc_enabled_)
+    return double_perc_.GetEncryptionOverhead();
+  return 0;	
+}
 }  // namespace webrtc

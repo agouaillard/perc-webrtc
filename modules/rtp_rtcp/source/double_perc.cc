@@ -154,6 +154,11 @@ bool DoublePERC::UnprotectRtp(void* p, int in_len, int* out_len) {
   return true;
 }
 
+size_t DoublePERC::GetEncryptionOverhead()
+{
+	return ohb_size + rtp_auth_tag_len_;
+}
+
 bool DoublePERC::Encrypt(rtp::Packet *packet)
 {
   // Calculate payload size for encrypted version
@@ -162,7 +167,7 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
   //Check it is enought
   if (encrypted_payload_size > packet->MaxPayloadSize()) {
     LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"
-      << " encrypted size wille exceed max payload size available";
+      << " encrypted size will exceed max payload size available";
     return false;
   }
   // Alloc temporal buffer for encryption
@@ -231,13 +236,12 @@ bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
  //Set decyrpted payload
   if (result) {
     // Remove the OHB data
-    *payload_length = out_length - ohb_size;
+    *payload_length = out_length - ohb_size - 1;
     // Copy the encrypted inner rtp packet except first byte  of rtp header
     memcpy(payload, inner + ohb_size + 1, *payload_length);
     LOG(LS_WARNING) << " DOUBLE PERC OK";
   } else {
-      LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"
-        << " could not allocate payload for decrypted data";
+      LOG(LS_WARNING) << "Failed to perform DOUBLE PERC";
       result = false;
   }
   
