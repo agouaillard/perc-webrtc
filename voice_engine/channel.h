@@ -418,8 +418,8 @@ class Channel
 
   // From OverheadObserver in the RTP/RTCP module
   void OnOverheadChanged(size_t overhead_bytes_per_packet) override;
-
- protected:
+  
+protected:
   void OnIncomingFractionLoss(int fraction_lost);
 
  private:

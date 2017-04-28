@@ -213,9 +213,9 @@ RtpStreamReceiver::RtpStreamReceiver(
     reference_finder_.reset(new video_coding::RtpFrameReferenceFinder(this));
   }
   
-  //TODO(sergio): Make this dinamyc
-  const char* key = "THIS IS THE 32 KEY WITH 12 SALT FOR DOUBLE PERC";
-  rtp_receiver_->EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(const uint8_t*)key,44);
+  // Check if end to end media encryption is enabled
+  if (config->media_crypto_enabled)
+    rtp_receiver_->EnableMediaCrypto(config->media_crypto_key);
 }
 
 RtpStreamReceiver::~RtpStreamReceiver() {

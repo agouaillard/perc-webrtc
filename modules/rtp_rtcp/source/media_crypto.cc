@@ -8,13 +8,15 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#include "webrtc/modules/rtp_rtcp/source/double_perc.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 
 #include <string.h>
 
 #include "third_party/libsrtp/include/srtp.h"
-#include "webrtc/modules/rtp_rtcp/source/double_perc.h"
+#include "webrtc/base/base64.h"
+#include "webrtc/base/buffer.h"
 #include "webrtc/base/sslstreamadapter.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 
 /* OHB data
  *   0                   1                   2                   3
@@ -31,26 +33,66 @@ static size_t ohb_size = 11;
 
 namespace webrtc {
   
-DoublePERC::DoublePERC()
+  
+bool MediaCryptoKey::Parse(int crypto_suite, const std::string &str) {
+  size_t len;
+  
+  // Decode 
+  if (!rtc::Base64::DecodeFromArray(
+    str.c_str(),
+    str.length(),
+    rtc::Base64::DecodeOption::DO_STRICT,
+    &buffer,
+    &len)) {
+    LOG(LS_WARNING) << "Error decoding E2E Media Crypto key" << str;
+    return false;
+  }
+  
+  // Check size
+  int expected_key_len;
+  int expected_salt_len;
+  if (!rtc::GetSrtpKeyAndSaltLengths(crypto_suite, &expected_key_len,
+      &expected_salt_len)) {
+    // This should never happen.
+    LOG(LS_WARNING) << "Failed to create MediaCryptoKey: unsupported"
+                    << " cipher_suite without length information"
+                    << crypto_suite;
+    return false;
+  }
+  size_t expected = static_cast<size_t>(expected_key_len + expected_salt_len);
+  if ( buffer.size() != expected) {
+    LOG(LS_WARNING) << "Failed to create SRTP session: invalid key"
+                    << " key length" << buffer.size()
+                    << " expected" << expected;
+    return false;
+  }
+  
+  type = crypto_suite;
+  return true;
+}
+  
+MediaCrypto::MediaCrypto()
     : session_(nullptr),
       rtp_auth_tag_len_(0),
       rtcp_auth_tag_len_(0) {
 }
 
-DoublePERC::~DoublePERC() {
+MediaCrypto::~MediaCrypto() {
   if (session_) {
     srtp_dealloc(session_);
   }
 }
-bool DoublePERC::SetOutboundKey(int cs, const uint8_t* key, size_t len) {
-  return SetKey(ssrc_any_inbound, cs, key, len);
+bool MediaCrypto::SetOutboundKey(const MediaCryptoKey& key) {
+  LOG(LS_ERROR) << "E2E media encryption oubound key set";
+  return SetKey(ssrc_any_outbound, key.type, key.buffer.data(), key.buffer.size());
 }
 
-bool DoublePERC::SetInboundKey(int cs, const uint8_t* key, size_t len) {
-  return SetKey(ssrc_any_outbound, cs, key, len);
+bool MediaCrypto::SetInboundKey(const MediaCryptoKey& key) {
+  LOG(LS_INFO) << "E2E media encryption inbound key set";
+  return SetKey(ssrc_any_inbound, key.type, key.buffer.data(), key.buffer.size());
 }
 
-bool DoublePERC::SetKey(int type, int cs, const uint8_t* key, size_t len) {
+bool MediaCrypto::SetKey(int type, int cs, const uint8_t* key, size_t len) {
 
   if (session_) {
     LOG(LS_ERROR) << "Failed to create SRTP session: "
@@ -116,7 +158,7 @@ bool DoublePERC::SetKey(int type, int cs, const uint8_t* key, size_t len) {
   return true;
 }
 
-bool DoublePERC::ProtectRtp(void* p, int in_len, int max_len, int* out_len) {
+bool MediaCrypto::ProtectRtp(void* p, int in_len, int max_len, int* out_len) {
   if (!session_) {
     LOG(LS_WARNING) << "Failed to protect SRTP packet: no SRTP Session";
     return false;
@@ -139,7 +181,7 @@ bool DoublePERC::ProtectRtp(void* p, int in_len, int max_len, int* out_len) {
 }
 
 
-bool DoublePERC::UnprotectRtp(void* p, int in_len, int* out_len) {
+bool MediaCrypto::UnprotectRtp(void* p, int in_len, int* out_len) {
   
   if (!session_) {
     LOG(LS_WARNING) << "Failed to unprotect SRTP packet: no SRTP Session";
@@ -158,12 +200,12 @@ bool DoublePERC::UnprotectRtp(void* p, int in_len, int* out_len) {
   return true;
 }
 
-size_t DoublePERC::GetEncryptionOverhead()
+size_t MediaCrypto::GetEncryptionOverhead()
 {
 	return ohb_size + rtp_auth_tag_len_;
 }
 
-bool DoublePERC::Encrypt(rtp::Packet *packet)
+bool MediaCrypto::Encrypt(rtp::Packet *packet)
 {
   // Calculate payload size for encrypted version
   size_t encrypted_payload_size = ohb_size + packet->payload_size() + rtp_auth_tag_len_;
@@ -236,7 +278,7 @@ bool DoublePERC::Encrypt(rtp::Packet *packet)
   return result;
 }
 
-bool DoublePERC::Decrypt(uint8_t* payload,size_t* payload_length) {
+bool MediaCrypto::Decrypt(uint8_t* payload,size_t* payload_length) {
   //Check we have enought data on payload
   if (*payload_length < ohb_size + rtp_auth_tag_len_) {
     LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"

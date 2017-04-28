@@ -92,6 +92,10 @@ class RtpRtcp : public Module {
     SendPacketObserver* send_packet_observer = nullptr;
     RateLimiter* retransmission_rate_limiter = nullptr;
     OverheadObserver* overhead_observer = nullptr;
+    
+    // End to end media encryption
+    bool media_crypto_enabled = false;
+    const MediaCryptoKey* media_crypto_key;
 
    private:
     RTC_DISALLOW_COPY_AND_ASSIGN(Configuration);

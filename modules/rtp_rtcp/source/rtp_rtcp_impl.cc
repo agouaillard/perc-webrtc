@@ -129,9 +129,9 @@ ModuleRtpRtcpImpl::ModuleRtpRtcpImpl(const Configuration& configuration)
   const size_t kTcpOverIpv4HeaderSize = 40;
   SetMaxRtpPacketSize(IP_PACKET_SIZE - kTcpOverIpv4HeaderSize);
   
-  //TODO(sergio): Make this dinamyc
-  const char* key = "THIS IS THE 32 KEY WITH 12 SALT FOR DOUBLE PERC";
-  rtp_sender_.EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(uint8_t*)key,44);
+  // Check if e2e media encryption key is set to enable it
+  if (configuration.media_crypto_enabled)
+    rtp_sender_.EnableMediaCrypto(*configuration.media_crypto_key);
 }
 
 // Returns the number of milliseconds until the module want a worker thread

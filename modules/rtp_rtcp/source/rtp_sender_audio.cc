@@ -245,8 +245,8 @@ bool RTPSenderAudio::SendAudio(FrameType frame_type,
   if (!rtp_sender_->AssignSequenceNumber(packet.get()))
     return false;
 
-  // Double PERC
-  if (!rtp_sender_->DoubleEncrypt(packet.get()))
+  // End to end media encryption
+  if (!rtp_sender_->MediaEncrypt(packet.get()))
     return false;
   
   {

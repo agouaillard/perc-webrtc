@@ -177,7 +177,7 @@ bool RtpReceiverImpl::IncomingRtpPacket(
   int32_t ret_val = rtp_media_receiver_->ParseRtpPacket(
       &webrtc_rtp_header, payload_specific, is_red, payload, payload_data_length,
       clock_->TimeInMilliseconds(), is_first_packet_in_frame,
-      double_perc_enabled_, &double_perc_);
+      media_crypto_enabled_, &media_crypto_);
 
   if (ret_val < 0) {
     return false;
@@ -462,12 +462,12 @@ void RtpReceiverImpl::CheckCSRC(const WebRtcRTPHeader& rtp_header) {
   }
 }
 
-bool RtpReceiverImpl::EnableDoublePERC(int suite, const uint8_t* key, size_t len) {
+bool RtpReceiverImpl::EnableMediaCrypto(const MediaCryptoKey &key) {
   
-  LOG(LS_INFO) << "Enabling Double PERC Encription";
+  LOG(LS_INFO) << "Enabling End to End Media Encription";
   
   rtc::CritScope cs(&critical_section_rtp_receiver_);
-  double_perc_enabled_ = double_perc_.SetInboundKey(suite, key, len);
-  return  double_perc_enabled_;
+  media_crypto_enabled_ = media_crypto_.SetInboundKey(key);
+  return  media_crypto_enabled_;
 }
 }  // namespace webrtc

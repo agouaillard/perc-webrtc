@@ -14,7 +14,7 @@
 #include "webrtc/base/criticalsection.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
-#include "webrtc/modules/rtp_rtcp/source/double_perc.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_utility.h"
 #include "webrtc/typedefs.h"
 
@@ -47,7 +47,7 @@ class RTPReceiverStrategy {
                                  int64_t timestamp_ms,
                                  bool is_first_packet,
 				 bool is_double_enabled,
-				 DoublePERC *double_perc) = 0;
+				 MediaCrypto *media_crypto) = 0;
 
   virtual TelephoneEventHandler* GetTelephoneEventHandler() = 0;
 

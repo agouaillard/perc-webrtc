@@ -504,6 +504,7 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
     bool presume_writable_when_fully_relayed;
     bool enable_ice_renomination;
     bool redetermine_role_on_ice_restart;
+    std::string media_crypto_key;
   };
   static_assert(sizeof(stuff_being_tested_for_equality) == sizeof(*this),
                 "Did you add something to RTCConfiguration and forget to "
@@ -535,7 +536,8 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
          presume_writable_when_fully_relayed ==
              o.presume_writable_when_fully_relayed &&
          enable_ice_renomination == o.enable_ice_renomination &&
-         redetermine_role_on_ice_restart == o.redetermine_role_on_ice_restart;
+         redetermine_role_on_ice_restart == o.redetermine_role_on_ice_restart &&
+         media_crypto_key == o.media_crypto_key;
 }
 
 bool PeerConnectionInterface::RTCConfiguration::operator!=(

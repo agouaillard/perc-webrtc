@@ -953,7 +953,8 @@ Channel::Channel(int32_t channelId,
   configuration.rtt_stats = &(*rtcp_rtt_stats_proxy_);
   configuration.retransmission_rate_limiter =
       retransmission_rate_limiter_.get();
-
+  configuration.media_crypto_enabled = config.media_crypto_enabled;
+  configuration.media_crypto_key = &config.media_crypto_key;
   _rtpRtcpModule.reset(RtpRtcp::CreateRtpRtcp(configuration));
   _rtpRtcpModule->SetSendingMediaStatus(false);
 
@@ -961,9 +962,8 @@ Channel::Channel(int32_t channelId,
   rtp_receive_statistics_->RegisterRtcpStatisticsCallback(
       statistics_proxy_.get());
   
-  //TODO(sergio): Make this dinamyc
-  const char* key = "THIS IS THE 32 KEY WITH 12 SALT FOR DOUBLE PERC";
-  rtp_receiver_->EnableDoublePERC(rtc::SRTP_AEAD_AES_256_GCM,(const uint8_t*)key,44);
+  if (config.media_crypto_enabled)
+    rtp_receiver_->EnableMediaCrypto(config.media_crypto_key);
 }
 
 Channel::~Channel() {

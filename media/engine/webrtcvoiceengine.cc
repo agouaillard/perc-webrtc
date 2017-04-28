@@ -1129,9 +1129,17 @@ void WebRtcVoiceEngine::StopAecDump() {
   }
 }
 
-int WebRtcVoiceEngine::CreateVoEChannel() {
+int WebRtcVoiceEngine:: CreateVoEChannel(const webrtc::MediaCryptoKey *key) {
   RTC_DCHECK(worker_thread_checker_.CalledOnValidThread());
-  return voe_wrapper_->base()->CreateChannel(channel_config_);
+  // Create a copy of the config
+  webrtc::VoEBase::ChannelConfig config = 
+    webrtc::VoEBase::ChannelConfig(channel_config_);
+  // Set end 2 end media crypto key in channel configuration
+  if (key) {
+    config.media_crypto_enabled = true;
+    config.media_crypto_key = *key;
+  }
+  return voe_wrapper_->base()->CreateChannel(config);
 }
 
 webrtc::AudioDeviceModule* WebRtcVoiceEngine::adm() {
@@ -2152,7 +2160,7 @@ bool WebRtcVoiceMediaChannel::SetAudioSend(uint32_t ssrc,
 }
 
 int WebRtcVoiceMediaChannel::CreateVoEChannel() {
-  int id = engine()->CreateVoEChannel();
+  int id = engine()->CreateVoEChannel(&media_crypto_key());
   if (id == -1) {
     LOG_RTCERR0(CreateVoEChannel);
     return -1;

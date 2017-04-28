@@ -128,6 +128,8 @@ bool Conductor::CreatePeerConnection(bool dtls) {
     constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
                             "false");
   }
+  // THIS IS THE 32 KEY WITH 12 SALT FOR DOUBLE PERC
+  config.media_crypto_key = "VEhJUyBJUyBUSEUgMzIgS0VZIFdJVEggMTIgU0FMVCBET1VCTEUgUEVSQyE=";
 
   peer_connection_ = peer_connection_factory_->CreatePeerConnection(
       config, &constraints, NULL, NULL, this);

@@ -647,6 +647,9 @@ class WebRtcSession :
 #ifdef HAVE_QUIC
   std::unique_ptr<QuicDataTransport> quic_data_transport_;
 #endif  // HAVE_QUIC
+  
+  MediaCryptoKey media_crypto_key_;
+  bool media_crypto_enabled_;
 
   RTC_DISALLOW_COPY_AND_ASSIGN(WebRtcSession);
 };

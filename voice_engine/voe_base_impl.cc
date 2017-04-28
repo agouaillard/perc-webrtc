@@ -364,7 +364,7 @@ int VoEBaseImpl::CreateChannel(const ChannelConfig& config) {
     return -1;
   }
 
-  ChannelConfig config_copy(config);
+  ChannelConfig config_copy = config;
   config_copy.acm_config.decoder_factory = decoder_factory_;
   voe::ChannelOwner channel_owner =
       shared_->channel_manager().CreateChannel(config_copy);

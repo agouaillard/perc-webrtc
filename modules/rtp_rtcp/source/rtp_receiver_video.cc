@@ -57,7 +57,7 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
                                          int64_t timestamp_ms,
                                          bool is_first_packet,
                                          bool is_double_enabled,
-                                         DoublePERC *double_perc) {
+                                         MediaCrypto *media_crypto) {
   TRACE_EVENT2(TRACE_DISABLED_BY_DEFAULT("webrtc_rtp"), "Video::ParseRtp",
                "seqnum", rtp_header->header.sequenceNumber, "timestamp",
                rtp_header->header.timestamp);
@@ -85,7 +85,7 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
   }
   
   if (is_double_enabled) {
-    if (!double_perc->Decrypt((uint8_t*)payload, &payload_data_length))
+    if (!media_crypto->Decrypt((uint8_t*)payload, &payload_data_length))
       return -1;
   }
 

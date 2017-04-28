@@ -33,7 +33,7 @@ class RTPReceiverVideo : public RTPReceiverStrategy {
                          int64_t timestamp,
                          bool is_first_packet,
 			 bool is_double_enabled,
-		         DoublePERC *double_perc) override;
+		         MediaCrypto *media_crypto) override;
 
   TelephoneEventHandler* GetTelephoneEventHandler() override { return NULL; }
 

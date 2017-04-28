@@ -106,7 +106,7 @@ class WebRtcVoiceEngine final : public webrtc::TraceCallback  {
   void Print(webrtc::TraceLevel level, const char* trace, int length) override;
 
   void StartAecDump(const std::string& filename);
-  int CreateVoEChannel();
+  int CreateVoEChannel(const webrtc::MediaCryptoKey *key);
   webrtc::AudioDeviceModule* adm();
   webrtc::AudioProcessing* apm();
 

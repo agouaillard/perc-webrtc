@@ -56,6 +56,7 @@ std::vector<RtpRtcp*> CreateRtpRtcpModules(
     RtcEventLog* event_log,
     RateLimiter* retransmission_rate_limiter,
     OverheadObserver* overhead_observer,
+    const MediaCryptoKey* media_crypto_key,                                          
     size_t num_modules) {
   RTC_DCHECK_GT(num_modules, 0);
   RtpRtcp::Configuration configuration;
@@ -80,6 +81,10 @@ std::vector<RtpRtcp*> CreateRtpRtcpModules(
   configuration.event_log = event_log;
   configuration.retransmission_rate_limiter = retransmission_rate_limiter;
   configuration.overhead_observer = overhead_observer;
+  if (media_crypto_key) {
+    configuration.media_crypto_enabled = true;
+    configuration.media_crypto_key = media_crypto_key;
+  }
   std::vector<RtpRtcp*> modules;
   for (size_t i = 0; i < num_modules; ++i) {
     RtpRtcp* rtp_rtcp = RtpRtcp::CreateRtpRtcp(configuration);
@@ -777,6 +782,7 @@ VideoSendStreamImpl::VideoSendStreamImpl(
           event_log,
           congestion_controller_->GetRetransmissionRateLimiter(),
           this,
+          config->media_crypto_enabled ? &(config->media_crypto_key) : NULL,
           config_->rtp.ssrcs.size())),
       payload_router_(rtp_rtcp_modules_,
                       config_->encoder_settings.payload_type),

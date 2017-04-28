@@ -136,7 +136,7 @@ int32_t RTPReceiverAudio::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
                                          int64_t timestamp_ms,
                                          bool is_first_packet,
                                          bool is_double_enabled,
-                                         DoublePERC *double_perc) {
+                                         MediaCrypto* media_crypto) {
   TRACE_EVENT2(TRACE_DISABLED_BY_DEFAULT("webrtc_rtp"), "Audio::ParseRtp",
                "seqnum", rtp_header->header.sequenceNumber, "timestamp",
                rtp_header->header.timestamp);
@@ -159,7 +159,7 @@ int32_t RTPReceiverAudio::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
                                  specific_payload.Audio,
                                  is_red,
                                  is_double_enabled,
-                                 double_perc);
+                                 media_crypto);
 }
 
 RTPAliveType RTPReceiverAudio::ProcessDeadOrAlive(
@@ -217,7 +217,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
     const AudioPayload& audio_specific,
     bool is_red,
     bool is_double_enabled,
-		DoublePERC *double_perc) {
+		MediaCrypto* media_crypto) {
 
   if (payload_length == 0) {
     return 0;
@@ -303,7 +303,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
       
     if (is_double_enabled) {
       size_t len = payload_length - 1;
-      if (!double_perc->Decrypt((uint8_t*)payload_data, &len))
+      if (!media_crypto->Decrypt((uint8_t*)payload_data, &len))
         return -1;
       payload_length = len + 1;
     }
@@ -314,7 +314,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
   }
   
   if (is_double_enabled) {
-    if (!double_perc->Decrypt((uint8_t*)payload_data, &payload_length))
+    if (!media_crypto->Decrypt((uint8_t*)payload_data, &payload_length))
       return -1;
   }
     

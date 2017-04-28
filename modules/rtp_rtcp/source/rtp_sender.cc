@@ -1284,24 +1284,24 @@ void RTPSender::UpdateRtpOverhead(const RtpPacketToSend& packet) {
   overhead_observer_->OnOverheadChanged(overhead_bytes_per_packet);
 }
 
-bool RTPSender::EnableDoublePERC(int suite, const uint8_t* key, size_t len) {
-  LOG(LS_INFO) << "Enabling Double PERC Encription";
+bool RTPSender::EnableMediaCrypto(const MediaCryptoKey &key) {
+  LOG(LS_INFO) << "Enabling E2E Media Encryption Encription";
   
   rtc::CritScope cs(&send_critsect_);
-  double_perc_enabled_ = double_perc_.SetOutboundKey(suite, key, len);
-  return  double_perc_enabled_;
+  media_crypto_enabled_ = media_crypto_.SetOutboundKey(key);
+  return  media_crypto_enabled_;
 }
 
-bool RTPSender::DoubleEncrypt(rtp::Packet *packet)
+bool RTPSender::MediaEncrypt(rtp::Packet *packet)
 {
-  if (double_perc_enabled_)
-    return double_perc_.Encrypt(packet);
+  if (media_crypto_enabled_)
+    return media_crypto_.Encrypt(packet);
   return true;
 }
-size_t RTPSender::GetDoubleEncryptionOverhead()
+size_t RTPSender::GetMediaEncryptionOverhead()
 {
- if (double_perc_enabled_)
-    return double_perc_.GetEncryptionOverhead();
+ if (media_crypto_enabled_)
+    return media_crypto_.GetEncryptionOverhead();
   return 0;	
 }
 }  // namespace webrtc

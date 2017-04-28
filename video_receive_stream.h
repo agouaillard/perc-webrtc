@@ -195,6 +195,10 @@ class VideoReceiveStream {
     // Target delay in milliseconds. A positive value indicates this stream is
     // used for streaming instead of a real-time call.
     int target_delay_ms = 0;
+    
+    // End to End media encryption
+    bool media_crypto_enabled = false;
+    MediaCryptoKey media_crypto_key;
   };
 
   // Starts stream activity.

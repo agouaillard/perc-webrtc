@@ -35,8 +35,10 @@
 #define WEBRTC_VOICE_ENGINE_VOE_BASE_H
 
 #include "webrtc/base/scoped_ref_ptr.h"
+#include "webrtc/base/optional.h"
 #include "webrtc/modules/audio_coding/codecs/audio_decoder_factory.h"
 #include "webrtc/modules/audio_coding/include/audio_coding_module.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 #include "webrtc/common_types.h"
 
 namespace webrtc {
@@ -99,6 +101,8 @@ class WEBRTC_DLLEXPORT VoEBase {
   struct ChannelConfig {
     AudioCodingModule::Config acm_config;
     bool enable_voice_pacing = false;
+    bool media_crypto_enabled = false;
+    MediaCryptoKey media_crypto_key;
   };
 
   // Factory for the VoEBase sub-API. Increases an internal reference

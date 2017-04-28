@@ -386,6 +386,8 @@ class PeerConnectionInterface : public rtc::RefCountInterface {
     // If true, ICE role is redetermined when peerconnection sets a local
     // transport description that indicates an ICE restart.
     bool redetermine_role_on_ice_restart = true;
+    // End to end media encryption key
+    std::string media_crypto_key;
     //
     // Don't forget to update operator== if adding something.
     //

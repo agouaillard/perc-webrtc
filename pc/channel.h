@@ -25,6 +25,7 @@
 #include "webrtc/base/network.h"
 #include "webrtc/base/sigslot.h"
 #include "webrtc/base/window.h"
+#include "webrtc/config.h"
 #include "webrtc/media/base/mediachannel.h"
 #include "webrtc/media/base/mediaengine.h"
 #include "webrtc/media/base/streamparams.h"
@@ -187,6 +188,9 @@ class BaseChannel
   virtual cricket::MediaType media_type() = 0;
 
   bool SetCryptoOptions(const rtc::CryptoOptions& crypto_options);
+  
+  // End to end media encryption
+  bool SetMediaCryptoKey(const webrtc::MediaCryptoKey& key);
 
   // This function returns true if we require SRTP for call setup.
   bool srtp_required_for_testing() const { return srtp_required_; }
@@ -342,7 +346,7 @@ class BaseChannel
   const rtc::CryptoOptions& crypto_options() const {
     return crypto_options_;
   }
-
+  
   // Handled in derived classes
   // Get the SRTP crypto suites to use for RTP media
   virtual void GetSrtpCryptoSuites_n(std::vector<int>* crypto_suites) const = 0;

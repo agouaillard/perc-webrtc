@@ -199,6 +199,9 @@ class VideoSendStream {
     // Enables periodic bandwidth probing in application-limited region.
     bool periodic_alr_bandwidth_probing = false;
 
+    // End to End media encryption
+    bool media_crypto_enabled = false;
+    MediaCryptoKey media_crypto_key;
    private:
     // Access to the copy constructor is private to force use of the Copy()
     // method for those exceptional cases where we do use it.

@@ -521,6 +521,14 @@ bool BaseChannel::SetCryptoOptions(const rtc::CryptoOptions& crypto_options) {
   return true;
 }
 
+bool BaseChannel::SetMediaCryptoKey(const webrtc::MediaCryptoKey &key) {
+  if (!media_channel_)
+    return false;
+  // Set it on the media channel
+  media_channel_->SetMediaCryptoKey(key);
+  return true;
+}
+
 void BaseChannel::OnWritableState(rtc::PacketTransportInterface* transport) {
   RTC_DCHECK(transport == rtp_transport_ || transport == rtcp_transport_);
   RTC_DCHECK(network_thread_->IsCurrent());

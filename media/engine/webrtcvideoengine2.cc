@@ -1075,13 +1075,18 @@ bool WebRtcVideoChannel2::AddSendStream(const StreamParams& sp) {
   config.suspend_below_min_bitrate = video_config_.suspend_below_min_bitrate;
   config.periodic_alr_bandwidth_probing =
       video_config_.periodic_alr_bandwidth_probing;
+  // Enable end to end media encryption
+  if (media_crypto_enabled()) {
+    config.media_crypto_enabled = true;
+    config.media_crypto_key = media_crypto_key();
+  }
   WebRtcVideoSendStream* stream = new WebRtcVideoSendStream(
       call_, sp, std::move(config), default_send_options_,
       external_encoder_factory_, video_config_.enable_cpu_overuse_detection,
       bitrate_config_.max_bitrate_bps, send_codec_, send_rtp_extensions_,
       send_params_);
-
-  uint32_t ssrc = sp.first_ssrc();
+  
+ uint32_t ssrc = sp.first_ssrc();
   RTC_DCHECK(ssrc != 0);
   send_streams_[ssrc] = stream;
 
@@ -1248,6 +1253,11 @@ void WebRtcVideoChannel2::ConfigureReceiverRtp(
   }
 
   config->rtp.extensions = recv_rtp_extensions_;
+  
+  if (media_crypto_enabled()) {
+    config->media_crypto_enabled = true;
+    config->media_crypto_key = media_crypto_key();
+  }
 }
 
 bool WebRtcVideoChannel2::RemoveRecvStream(uint32_t ssrc) {
