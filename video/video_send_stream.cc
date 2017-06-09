@@ -84,6 +84,9 @@ std::vector<RtpRtcp*> CreateRtpRtcpModules(
   if (media_crypto_key) {
     configuration.media_crypto_enabled = true;
     configuration.media_crypto_key = media_crypto_key;
+  } else {
+    configuration.media_crypto_enabled = false;
+    configuration.media_crypto_key = nullptr;
   }
   std::vector<RtpRtcp*> modules;
   for (size_t i = 0; i < num_modules; ++i) {

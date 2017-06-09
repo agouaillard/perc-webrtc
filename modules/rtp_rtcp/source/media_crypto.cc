@@ -202,11 +202,19 @@ bool MediaCrypto::UnprotectRtp(void* p, int in_len, int* out_len) {
 
 size_t MediaCrypto::GetEncryptionOverhead()
 {
-	return ohb_size + rtp_auth_tag_len_;
+  if (!session_)
+    return 0;
+  
+  return ohb_size + rtp_auth_tag_len_;
 }
 
 bool MediaCrypto::Encrypt(rtp::Packet *packet)
 {
+   if (!session_) {
+    LOG(LS_WARNING) << "Failed to encrypt RTP packet: no SRTP Session";
+    return false;
+  }
+   
   // Calculate payload size for encrypted version
   size_t encrypted_payload_size = ohb_size + packet->payload_size() + rtp_auth_tag_len_;
   
@@ -279,6 +287,10 @@ bool MediaCrypto::Encrypt(rtp::Packet *packet)
 }
 
 bool MediaCrypto::Decrypt(uint8_t* payload,size_t* payload_length) {
+   if (!session_) {
+    LOG(LS_WARNING) << "Failed to decrypt RTP packet: no SRTP Session";
+    return false;
+  }	
   //Check we have enought data on payload
   if (*payload_length < ohb_size + rtp_auth_tag_len_) {
     LOG(LS_WARNING) << "Failed to perform DOUBLE PERC"

@@ -2160,7 +2160,7 @@ bool WebRtcVoiceMediaChannel::SetAudioSend(uint32_t ssrc,
 }
 
 int WebRtcVoiceMediaChannel::CreateVoEChannel() {
-  int id = engine()->CreateVoEChannel(&media_crypto_key());
+  int id = engine()->CreateVoEChannel(media_crypto_enabled() ? &media_crypto_key() : NULL);
   if (id == -1) {
     LOG_RTCERR0(CreateVoEChannel);
     return -1;

@@ -540,7 +540,7 @@ bool WebRtcSession::Initialize(
     if (!media_crypto_key_.Parse(rtc::SRTP_AEAD_AES_256_GCM,
       rtc_configuration.media_crypto_key))
         return false;
-    LOG(LS_INFO) << "Enabling E2E Media Encryption";
+    LOG(LS_INFO) << "Enabling E2E Media Encryption with key " << rtc_configuration.media_crypto_key;
     media_crypto_enabled_ = true;
   }
   

@@ -95,7 +95,7 @@ class RtpRtcp : public Module {
     
     // End to end media encryption
     bool media_crypto_enabled = false;
-    const MediaCryptoKey* media_crypto_key;
+    const MediaCryptoKey* media_crypto_key = nullptr;
 
    private:
     RTC_DISALLOW_COPY_AND_ASSIGN(Configuration);

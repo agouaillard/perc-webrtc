@@ -124,7 +124,8 @@ RTPSender::RTPSender(
       rtx_(kRtxOff),
       rtp_overhead_bytes_per_packet_(0),
       retransmission_rate_limiter_(retransmission_rate_limiter),
-      overhead_observer_(overhead_observer) {
+      overhead_observer_(overhead_observer),
+      media_crypto_enabled_(false) {
   ssrc_ = ssrc_db_->CreateSSRC();
   RTC_DCHECK(ssrc_ != 0);
   ssrc_rtx_ = ssrc_db_->CreateSSRC();
@@ -1285,7 +1286,7 @@ void RTPSender::UpdateRtpOverhead(const RtpPacketToSend& packet) {
 }
 
 bool RTPSender::EnableMediaCrypto(const MediaCryptoKey &key) {
-  LOG(LS_INFO) << "Enabling E2E Media Encryption Encription";
+  LOG(LS_INFO) << "Enabling E2E Media Encryption";
   
   rtc::CritScope cs(&send_critsect_);
   media_crypto_enabled_ = media_crypto_.SetOutboundKey(key);

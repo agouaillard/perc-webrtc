@@ -69,7 +69,8 @@ RtpReceiverImpl::RtpReceiverImpl(
       current_remote_csrc_(),
       last_received_timestamp_(0),
       last_received_frame_time_ms_(-1),
-      last_received_sequence_number_(0) {
+      last_received_sequence_number_(0),
+      media_crypto_enabled_(false) {
   assert(incoming_messages_callback);
 
   memset(current_remote_csrc_, 0, sizeof(current_remote_csrc_));
