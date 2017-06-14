@@ -176,7 +176,7 @@ bool RtpReceiverImpl::IncomingRtpPacket(
   }
 
   int32_t ret_val = rtp_media_receiver_->ParseRtpPacket(
-      &webrtc_rtp_header, payload_specific, is_red, payload, payload_data_length,
+      &webrtc_rtp_header, payload_specific, is_red, payload, payload_length,
       clock_->TimeInMilliseconds(), is_first_packet_in_frame,
       media_crypto_enabled_, &media_crypto_);
 

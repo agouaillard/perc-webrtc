@@ -303,7 +303,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
       
     if (is_double_enabled) {
       size_t len = payload_length - 1;
-      if (!media_crypto->Decrypt((uint8_t*)payload_data, &len))
+      if (!media_crypto->Decrypt((uint8_t*)payload_data + 1, &len))
         return -1;
       payload_length = len + 1;
     }
