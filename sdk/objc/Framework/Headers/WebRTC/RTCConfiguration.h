@@ -104,6 +104,8 @@ RTC_EXPORT
  */
 @property(nonatomic, assign) BOOL shouldPresumeWritableWhenFullyRelayed;
 
+@property(nonatomic, copy) NSString *mediaCryptoKey;
+
 - (instancetype)init NS_DESIGNATED_INITIALIZER;
 
 @end
