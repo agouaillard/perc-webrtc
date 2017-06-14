@@ -8,6 +8,9 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
+// Comment the following line to disable media crypto key
+#define HAVE_MEDIA_CRYPTO_KEY 1
+
 #import "ARDAppClient+Internal.h"
 
 #import "WebRTC/RTCAVFoundationVideoSource.h"
@@ -539,6 +542,9 @@ static int const kKbpsMultiplier = 1000;
   RTCMediaConstraints *constraints = [self defaultPeerConnectionConstraints];
   RTCConfiguration *config = [[RTCConfiguration alloc] init];
   config.iceServers = _iceServers;
+#ifdef HAVE_MEDIA_CRYPTO_KEY
+  config.mediaCryptoKey = [[self class] generateSecureUUID:32];
+#endif
   _peerConnection = [_factory peerConnectionWithConfiguration:config
                                                   constraints:constraints
                                                      delegate:self];
@@ -858,6 +864,14 @@ static int const kKbpsMultiplier = 1000;
       break;
   }
   return error;
+}
+
++ (NSString*)generateSecureUUID:(NSInteger)length {
+    NSMutableData *data = [NSMutableData dataWithLength:length];
+    int result = SecRandomCopyBytes(NULL, length, data.mutableBytes);
+    NSAssert(result == 0, @"Error generating random bytes: %d", errno);
+    NSString *base64EncodedData = [data base64EncodedStringWithOptions:0];
+    return base64EncodedData;
 }
 
 @end
