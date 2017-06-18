@@ -37,6 +37,7 @@
 @synthesize shouldPruneTurnPorts = _shouldPruneTurnPorts;
 @synthesize shouldPresumeWritableWhenFullyRelayed =
     _shouldPresumeWritableWhenFullyRelayed;
+@synthesize mediaCryptoKey = _mediaCryptoKey;
 
 - (instancetype)init {
   if (self = [super init]) {
@@ -139,7 +140,10 @@
   nativeConfig->prune_turn_ports = _shouldPruneTurnPorts ? true : false;
   nativeConfig->presume_writable_when_fully_relayed =
       _shouldPresumeWritableWhenFullyRelayed ? true : false;
-
+  
+  if (_mediaCryptoKey)
+      nativeConfig->media_crypto_key = std::string([_mediaCryptoKey UTF8String]);
+    
   return nativeConfig.release();
 }
 
