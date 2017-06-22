@@ -33,6 +33,7 @@ constexpr uint8_t kAudioLevelExtensionId = 9;
 constexpr uint8_t kRtpStreamIdExtensionId = 0xa;
 constexpr uint8_t kRtpMidExtensionId = 0xb;
 constexpr uint8_t kVideoTimingExtensionId = 0xc;
+constexpr uint8_t kRtpFrameMarkingExtensionId = 8;
 constexpr int32_t kTimeOffset = 0x56ce;
 constexpr bool kVoiceActive = true;
 constexpr uint8_t kAudioLevel = 0x5a;
@@ -194,6 +195,64 @@ TEST(RtpPacketTest, TryToCreateWithLongMid) {
   extensions.Register<RtpMid>(kRtpMidExtensionId);
   RtpPacketToSend packet(&extensions);
   EXPECT_FALSE(packet.SetExtension<RtpMid>(kLongMid));
+}
+
+TEST(RtpPacketTest, CreateWithFrameMarks) {
+  RtpPacketToSend::ExtensionManager extensions;
+  extensions.Register<FrameMarking>(kRtpFrameMarkingExtensionId);
+  RtpPacketToSend packet(&extensions);
+  packet.SetPayloadType(kPayloadType);
+  packet.SetSequenceNumber(kSeqNum);
+  packet.SetTimestamp(kTimestamp);
+  packet.SetSsrc(kSsrc);
+  FrameMarks frame_marks;  // S:1 E:1 I:1 D:0 TID:0
+  frame_marks.start_of_frame = true;
+  frame_marks.end_of_frame = true;
+  frame_marks.independent = true;
+  EXPECT_TRUE(packet.SetExtension<FrameMarking>(frame_marks));
+  EXPECT_THAT(kPacketWithFrameMarks,
+              ElementsAreArray(packet.data(), packet.size()));
+}
+
+TEST(RtpPacketTest, CreateWithFrameMarksSVC) {
+  RtpPacketToSend::ExtensionManager extensions;
+  extensions.Register<FrameMarking>(kRtpFrameMarkingExtensionId);
+  RtpPacketToSend packet(&extensions);
+  packet.SetPayloadType(kPayloadType);
+  packet.SetSequenceNumber(kSeqNum);
+  packet.SetTimestamp(kTimestamp);
+  packet.SetSsrc(kSsrc);
+  FrameMarks frame_marks;  // S:1 E:1 I:1 D:0 TID:1
+  frame_marks.start_of_frame = true;
+  frame_marks.end_of_frame = true;
+  frame_marks.independent = true;
+  frame_marks.temporal_layer_id = 1;
+  EXPECT_TRUE(packet.SetExtension<FrameMarking>(frame_marks));
+  EXPECT_THAT(kPacketWithFrameMarksSVC,
+              ElementsAreArray(packet.data(), packet.size()));
+}
+
+TEST(RtpPacketTest, CreateWithFrameMarksSVCVP9) {
+  RtpPacketToSend::ExtensionManager extensions;
+  extensions.Register<FrameMarking>(kRtpFrameMarkingExtensionId);
+  RtpPacketToSend packet(&extensions);
+  packet.SetPayloadType(kPayloadType);
+  packet.SetSequenceNumber(kSeqNum);
+  packet.SetTimestamp(kTimestamp);
+  packet.SetSsrc(kSsrc);
+  FrameMarks frame_marks;  // S:1 E:1 I:1 D:0 TID:1 P:1 U:1 SID: 2
+  frame_marks.start_of_frame = true;
+  frame_marks.end_of_frame = true;
+  frame_marks.independent = true;
+  frame_marks.temporal_layer_id = 1;
+  RTPVideoHeaderVP9 vp9;
+  vp9.spatial_idx = 2;
+  vp9.temporal_up_switch = true;
+  vp9.inter_pic_predicted = true;
+  frame_marks.layer_id = FrameMarking::CreateLayerId(vp9);
+  EXPECT_TRUE(packet.SetExtension<FrameMarking>(frame_marks));
+  EXPECT_THAT(kPacketWithFrameMarksSVCVP9,
+              ElementsAreArray(packet.data(), packet.size()));
 }
 
 TEST(RtpPacketTest, CreateWithExtensionsWithoutManager) {
