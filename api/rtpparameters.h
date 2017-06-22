@@ -279,6 +279,11 @@ struct RtpExtension {
   // Encryption of Header Extensions, see RFC 6904 for details:
   // https://tools.ietf.org/html/rfc6904
   static const char kEncryptHeaderExtensionsUri[];
+  
+  // Frame Marking RTP Header Extension
+  // https://tools.ietf.org/html/draft-ietf-avtext-framemarking-06
+  static const char* kFrameMarkingUri;
+  static const int kFrameMarkingDefaultId;
 
   // Inclusive min and max IDs for one-byte header extensions, per RFC5285.
   static const int kMinId;

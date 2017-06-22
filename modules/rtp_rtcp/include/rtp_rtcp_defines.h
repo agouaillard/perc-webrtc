@@ -112,6 +112,7 @@ enum RTPExtensionType {
   kRtpExtensionRtpStreamId,
   kRtpExtensionRepairedRtpStreamId,
   kRtpExtensionMid,
+  kRtpExtensionFrameMarking,
   kRtpExtensionNumberOfExtensions  // Must be the last entity in the enum.
 };
 
