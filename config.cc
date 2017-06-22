@@ -87,6 +87,13 @@ const int RtpExtension::kVideoTimingDefaultId = 8;
 const char* RtpExtension::kEncryptHeaderExtensionsUri =
     "urn:ietf:params:rtp-hdrext:encrypt";
 
+// This extensions provides meta-information about the RTP streams outside the
+// encrypted media payload, an RTP switch can do codec-agnostic
+// selective forwarding without decrypting the payload
+const char* RtpExtension::kFrameMarkingUri =
+    "urn:ietf:params:rtp-hdrext:framemarking";
+const int RtpExtension::kFrameMarkingDefaultId = 9;
+
 const int RtpExtension::kMinId = 1;
 const int RtpExtension::kMaxId = 14;
 
@@ -102,7 +109,8 @@ bool RtpExtension::IsSupportedForVideo(const std::string& uri) {
          uri == webrtc::RtpExtension::kTransportSequenceNumberUri ||
          uri == webrtc::RtpExtension::kPlayoutDelayUri ||
          uri == webrtc::RtpExtension::kVideoContentTypeUri ||
-         uri == webrtc::RtpExtension::kVideoTimingUri;
+         uri == webrtc::RtpExtension::kVideoTimingUri ||
+         uri == webrtc::RtpExtension::kFrameMarkingUri;
 }
 
 bool RtpExtension::IsEncryptionSupported(const std::string& uri) {

@@ -351,6 +351,50 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
     retransmission_settings = retransmission_settings_;
   }
 
+  // Set Frame Marks.
+  FrameMarks frame_marks;
+  bool frame_marking_enabled = true;
+
+  // Common info
+  frame_marks.start_of_frame = true;
+  frame_marks.end_of_frame = false;
+  frame_marks.independent = (frame_type == kVideoFrameKey);
+
+  // Codec specific.
+  switch (video_type) {
+    case kRtpVideoH264:
+      // Nothing to add
+      frame_marks.discardable = false;
+      frame_marks.temporal_layer_id = kNoTemporalIdx;
+      frame_marks.layer_id = kNoSpatialIdx;
+      frame_marks.tl0_pic_idx = static_cast<uint8_t>(kNoTl0PicIdx);
+      break;
+    case kRtpVideoVp8:
+      frame_marks.discardable = video_header->codecHeader.VP8.nonReference;
+      frame_marks.base_layer_sync = video_header->codecHeader.VP8.layerSync;
+      frame_marks.temporal_layer_id = video_header->codecHeader.VP8.temporalIdx;
+      frame_marks.layer_id = kNoSpatialIdx;
+      frame_marks.tl0_pic_idx = video_header->codecHeader.VP8.tl0PicIdx;
+      break;
+    case kRtpVideoVp9:
+      frame_marks.discardable = false;
+      // Layer id format is codec dependant.
+      frame_marks.temporal_layer_id =
+          video_header->codecHeader.VP9.temporal_idx;
+      frame_marks.layer_id =
+          FrameMarking::CreateLayerId(video_header->codecHeader.VP9);
+      frame_marks.tl0_pic_idx = video_header->codecHeader.VP9.tl0_pic_idx;
+      break;
+    default:
+      // Do not use frame marking.
+      frame_marking_enabled = false;
+  }
+
+  // Only add frame marking for known codecs.
+  if (frame_marking_enabled)
+    // Add extension header for frame marking.
+    rtp_header->SetExtension<FrameMarking>(frame_marks);
+
   size_t packet_capacity = rtp_sender_->MaxRtpPacketSize() -
                            fec_packet_overhead -
                            (rtp_sender_->RtxStatus() ? kRtxHeaderSize : 0);
@@ -381,6 +425,7 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
 
   bool first_frame = first_frame_sent_();
   for (size_t i = 0; i < num_packets; ++i) {
+    bool first = (i == 0);
     bool last = (i + 1) == num_packets;
     auto packet = last ? std::move(last_packet)
                        : rtc::MakeUnique<RtpPacketToSend>(*rtp_header);
@@ -389,6 +434,16 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
     RTC_DCHECK_LE(packet->payload_size(),
                   last ? max_data_payload_length - last_packet_reduction_len
                        : max_data_payload_length);
+
+    // Only add frame marking for known codecs.
+    if (frame_marking_enabled) {
+      // Update start and end marks.
+      frame_marks.start_of_frame = first;
+      frame_marks.end_of_frame = last;
+      // Update extension header for frame marking.
+      packet->SetExtension<FrameMarking>(frame_marks);
+    }
+
     if (!rtp_sender_->AssignSequenceNumber(packet.get()))
       return false;
 

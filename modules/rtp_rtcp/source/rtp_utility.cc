@@ -254,6 +254,9 @@ bool RtpHeaderParser::Parse(RTPHeader* header,
   header->extension.has_video_timing = false;
   header->extension.video_timing = {0u, 0u, 0u, 0u, 0u, 0u, false};
 
+  // May not be present in packet.
+  header->extension.has_frame_marks = false;
+
   if (X) {
     /* RTP header extension, RFC 3550.
      0                   1                   2                   3
@@ -482,6 +485,15 @@ void RtpHeaderParser::ParseOneByteExtensionHeader(
         case kRtpExtensionRepairedRtpStreamId: {
           header->extension.repaired_stream_id.Set(
               rtc::MakeArrayView(ptr, len + 1));
+          break;
+        }
+        case kRtpExtensionFrameMarking: {
+          if (!FrameMarking::Parse(rtc::MakeArrayView(ptr, len + 1),
+                                   &header->extension.frame_marks)) {
+            LOG(LS_WARNING) << "Incorrect frame marking extension";
+            return;
+          }
+          header->extension.has_frame_marks = true;
           break;
         }
         case kRtpExtensionNone:

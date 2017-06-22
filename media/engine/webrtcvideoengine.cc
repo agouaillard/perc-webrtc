@@ -437,6 +437,9 @@ RtpCapabilities WebRtcVideoEngine::GetCapabilities() const {
   }
   // TODO(ilnik): Add kVideoTimingUri/kVideoTimingDefaultId to capabilities.
   // Possibly inside field trial.
+  capabilities.header_extensions.push_back(
+      webrtc::RtpExtension(webrtc::RtpExtension::kFrameMarkingUri,
+                           webrtc::RtpExtension::kFrameMarkingDefaultId));
   return capabilities;
 }
 
