@@ -94,6 +94,10 @@ class VideoSendStream : public webrtc::VideoSendStream {
 
   void SetTransportOverhead(size_t transport_overhead_per_packet);
 
+  // End to end media crypto.
+  bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) override;
+
  private:
   class ConstructionTask;
   class DestructAndGetRtpStateTask;

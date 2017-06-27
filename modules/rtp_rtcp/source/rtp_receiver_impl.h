@@ -69,6 +69,9 @@ class RtpReceiverImpl : public RtpReceiver {
     return csrc_sources_;
   }
 
+  // End to end media encryption.
+  bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) override;
+
  private:
   void CheckSSRCChanged(const RTPHeader& rtp_header);
   void CheckCSRC(const WebRtcRTPHeader& rtp_header);

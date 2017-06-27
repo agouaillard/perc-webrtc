@@ -728,5 +728,11 @@ void AudioSendStream::RegisterCngPayloadType(int payload_type,
     }
   }
 }
+
+bool AudioSendStream::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  return channel_proxy_->SetMediaCrypto(media_crypto);
+}
+
 }  // namespace internal
 }  // namespace webrtc

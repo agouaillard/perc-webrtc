@@ -392,11 +392,16 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
       // Do not use frame marking.
       frame_marking_enabled = false;
   }
-
-
+  // End to End media encryption
+  const std::shared_ptr<webrtc::MediaCrypto>& media_crypto = 
+    rtp_sender_->GetMediaCrypto();
+  
+  size_t media_crypto_overhead = 
+    media_crypto ? media_crypto->GetMaxEncryptionOverhead() : 0;
   size_t packet_capacity = rtp_sender_->MaxRtpPacketSize() -
                            fec_packet_overhead -
-                           (rtp_sender_->RtxStatus() ? kRtxHeaderSize : 0);
+                           (rtp_sender_->RtxStatus() ? kRtxHeaderSize : 0) -
+                           media_crypto_overhead;
   RTC_DCHECK_LE(packet_capacity, rtp_header->capacity());
   RTC_DCHECK_GT(packet_capacity, rtp_header->headers_size());
   RTC_DCHECK_GT(packet_capacity, last_packet->headers_size());
@@ -443,6 +448,23 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
 
     if (!rtp_sender_->AssignSequenceNumber(packet.get()))
       return false;
+
+    // End to end media encryption.
+    if (media_crypto) {
+      // Get current payload size.
+      size_t payload_size = packet->payload_size();
+      // Allocate space for maximum payload overhead and get writable pointer.
+      uint8_t* payload = packet->SetPayloadSize(
+        payload_size + media_crypto->GetMaxEncryptionOverhead());
+      // Encrypt media payload.
+      if (!media_crypto->Encrypt(cricket::MediaType::MEDIA_TYPE_VIDEO,
+                                 packet->Ssrc(), first, last,
+                                 (frame_type == kVideoFrameKey), payload,
+                                 &payload_size))
+        return false;
+      // Set the new payload size after encryption.
+      packet->SetPayloadSize(payload_size);
+    }
 
     // No FEC protection for upper temporal layers, if used.
     bool protect_packet = temporal_id == 0 || temporal_id == kNoTemporalIdx;

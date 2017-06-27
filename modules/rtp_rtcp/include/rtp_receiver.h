@@ -107,6 +107,9 @@ class RtpReceiver {
   virtual int32_t Energy(uint8_t array_of_energy[kRtpCsrcSize]) const = 0;
 
   virtual std::vector<RtpSource> GetSources() const = 0;
+
+  // End to End media ecnryption.
+  virtual bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) = 0;
 };
 }  // namespace webrtc
 

@@ -38,6 +38,8 @@ class MockAudioSendStream : public AudioSendStream {
   MOCK_METHOD1(SetMuted, void(bool muted));
   MOCK_CONST_METHOD0(GetStats, Stats());
   MOCK_CONST_METHOD1(GetStats, Stats(bool has_remote_tracks));
+  MOCK_METHOD1(SetMediaCrypto, 
+               bool(const std::shared_ptr<webrtc::MediaCrypto>&));
 };
 }  // namespace test
 }  // namespace webrtc

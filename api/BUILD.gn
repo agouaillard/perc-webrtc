@@ -52,6 +52,7 @@ rtc_static_library("libjingle_peerconnection_api") {
     "jsepsessiondescription.h",
     "mediaconstraintsinterface.cc",
     "mediaconstraintsinterface.h",
+    "mediacrypto.h",
     "mediastreaminterface.cc",
     "mediastreaminterface.h",
     "mediastreamproxy.h",

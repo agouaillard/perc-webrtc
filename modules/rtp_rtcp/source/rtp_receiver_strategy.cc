@@ -9,6 +9,7 @@
  */
 
 #include "modules/rtp_rtcp/source/rtp_receiver_strategy.h"
+#include "rtc_base/logging.h"
 
 #include <stdlib.h>
 
@@ -42,4 +43,11 @@ int RTPReceiverStrategy::Energy(uint8_t array_of_energy[kRtpCsrcSize]) const {
   return -1;
 }
 
+bool RTPReceiverStrategy::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  RTC_LOG(LS_INFO) << "Setting End to End Media Encryption";
+  rtc::CritScope cs(&crit_sect_);
+  media_crypto_ = media_crypto;
+  return true;
+}
 }  // namespace webrtc

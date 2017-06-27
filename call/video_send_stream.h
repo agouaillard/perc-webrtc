@@ -286,6 +286,10 @@ class VideoSendStream {
   inline void DisableEncodedFrameRecording() {
     EnableEncodedFrameRecording(std::vector<rtc::PlatformFile>(), 0);
   }
+  
+  // End to End media encryption.
+  virtual bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) = 0;
 
  protected:
   virtual ~VideoSendStream() {}

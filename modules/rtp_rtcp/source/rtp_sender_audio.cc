@@ -229,6 +229,24 @@ bool RTPSenderAudio::SendAudio(FrameType frame_type,
 
   if (!rtp_sender_->AssignSequenceNumber(packet.get()))
     return false;
+  
+  // End to End media encryption.
+  const std::shared_ptr<webrtc::MediaCrypto>& media_crypto = 
+    rtp_sender_->GetMediaCrypto();
+  if (media_crypto) {
+    // Get current payload size.
+    size_t payload_size = packet->payload_size();
+    // Allocate space for maximum payload overhead and get writable pointer.
+    uint8_t* payload = packet->SetPayloadSize(
+      payload_size + media_crypto->GetMaxEncryptionOverhead());
+    // Encrypt media payload.
+    if (!media_crypto->Encrypt(cricket::MediaType::MEDIA_TYPE_AUDIO,
+                               packet->Ssrc(), true, true, false, payload,
+                               &payload_size))
+      return false;
+    // Set the new payload size after encryption.
+    packet->SetPayloadSize(payload_size);
+  }
 
   {
     rtc::CritScope cs(&send_audio_critsect_);

@@ -900,6 +900,8 @@ bool WebRtcVideoChannel::SetRtpReceiveParameters(
           << "with SSRC " << ssrc << " which doesn't exist.";
       return false;
     }
+
+    return it->second->SetRtpParameters(parameters);
   }
 
   webrtc::RtpParameters current_parameters = GetRtpReceiveParameters(ssrc);
@@ -1124,6 +1126,9 @@ bool WebRtcVideoChannel::AddSendStream(const StreamParams& sp) {
     stream->SetSend(true);
   }
 
+  // Set end to end media encryption key
+  stream->SetMediaCrypto(media_crypto());
+
   return true;
 }
 
@@ -1215,9 +1220,14 @@ bool WebRtcVideoChannel::AddRecvStream(const StreamParams& sp,
       video_config_.disable_prerenderer_smoothing;
   config.sync_group = sp.sync_label;
 
-  receive_streams_[ssrc] = new WebRtcVideoReceiveStream(
+  WebRtcVideoReceiveStream* stream = new WebRtcVideoReceiveStream(
       call_, sp, std::move(config), decoder_factory_, default_stream,
       recv_codecs_, flexfec_config);
+
+  // Set end to end media encryption.
+  stream->SetMediaCrypto(media_crypto());
+
+  receive_streams_[ssrc] = stream;
 
   return true;
 }
@@ -1800,8 +1810,23 @@ bool WebRtcVideoChannel::WebRtcVideoSendStream::SetRtpParameters(
   if (reconfigure_encoder) {
     ReconfigureEncoder();
   }
+
+  // Encoding may have been activated/deactivated.
+  if (rtp_parameters_.media_crypto) {
+    SetMediaCrypto(rtp_parameters_.media_crypto);
+  }
+
   // Encoding may have been activated/deactivated.
   UpdateSendState();
+  return true;
+}
+
+bool WebRtcVideoChannel::WebRtcVideoSendStream::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  RTC_DCHECK_RUN_ON(&thread_checker_);
+  media_crypto_ = media_crypto;
+  if (stream_)
+    stream_->SetMediaCrypto(media_crypto_);
   return true;
 }
 
@@ -2085,6 +2110,8 @@ void WebRtcVideoChannel::WebRtcVideoSendStream::RecreateWebRtcStream() {
   }
   stream_ = call_->CreateVideoSendStream(std::move(config),
                                          parameters_.encoder_config.Copy());
+  // End to End media encryption
+  stream_->SetMediaCrypto(media_crypto_);
 
   parameters_.encoder_config.encoder_specific_settings = NULL;
 
@@ -2302,6 +2329,27 @@ void WebRtcVideoChannel::WebRtcVideoReceiveStream::SetRecvParameters(
   }
 }
 
+bool WebRtcVideoChannel::WebRtcVideoReceiveStream::SetRtpParameters(
+    const webrtc::RtpParameters& parameters) {
+  // TODO(deadbeef): Update the rest of rtp parameters accordingly
+
+  // Check e2e media enctription.
+  if (parameters.media_crypto) {
+    RTC_LOG(LS_INFO) << "Enabling End to End Media Encryption";
+    SetMediaCrypto(parameters.media_crypto);
+  }
+
+  return true;
+}
+
+bool WebRtcVideoChannel::WebRtcVideoReceiveStream::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  media_crypto_ = media_crypto;
+  if (stream_)
+    stream_->SetMediaCrypto(media_crypto_);
+  return true;
+}
+
 void WebRtcVideoChannel::WebRtcVideoReceiveStream::
     RecreateWebRtcVideoStream() {
   if (stream_) {
@@ -2314,6 +2362,8 @@ void WebRtcVideoChannel::WebRtcVideoReceiveStream::
   stream_ = call_->CreateVideoReceiveStream(std::move(config));
   MaybeAssociateFlexfecWithVideo();
   stream_->Start();
+  // End to End media encryption.
+  stream_->SetMediaCrypto(media_crypto_);
 }
 
 void WebRtcVideoChannel::WebRtcVideoReceiveStream::

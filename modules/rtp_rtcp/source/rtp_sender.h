@@ -207,6 +207,10 @@ class RTPSender {
 
   void SetRtt(int64_t rtt_ms);
 
+  // End to End media crypto.
+  bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+  const std::shared_ptr<webrtc::MediaCrypto>& GetMediaCrypto() const;
+
  protected:
   int32_t CheckPayloadType(int8_t payload_type, RtpVideoCodecTypes* video_type);
 
@@ -330,6 +334,9 @@ class RTPSender {
   OverheadObserver* overhead_observer_;
 
   const bool send_side_bwe_with_overhead_;
+
+  // End to end media encryption.
+  std::shared_ptr<webrtc::MediaCrypto> media_crypto_;
 
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(RTPSender);
 };
