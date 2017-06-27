@@ -19,6 +19,7 @@
 #include "webrtc/call/audio_receive_stream.h"
 #include "webrtc/call/rtp_packet_sink_interface.h"
 #include "webrtc/call/syncable.h"
+#include "webrtc/modules/rtp_rtcp/include/rtp_rtcp.h"
 #include "webrtc/rtc_base/constructormagic.h"
 #include "webrtc/rtc_base/thread_checker.h"
 
@@ -78,6 +79,9 @@ class AudioReceiveStream final : public webrtc::AudioReceiveStream,
   void SignalNetworkState(NetworkState state);
   bool DeliverRtcp(const uint8_t* packet, size_t length);
   const webrtc::AudioReceiveStream::Config& config() const;
+
+  // End to end media crypto
+  bool SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& media_crypto_key);
 
  private:
   VoiceEngine* voice_engine() const;

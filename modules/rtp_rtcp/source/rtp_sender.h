@@ -21,6 +21,7 @@
 #include "webrtc/modules/rtp_rtcp/include/flexfec_sender.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_header_extension_map.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 #include "webrtc/modules/rtp_rtcp/source/playout_delay_oracle.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_packet_history.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_rtcp_config.h"
@@ -208,6 +209,11 @@ class RTPSender {
   int64_t LastTimestampTimeMs() const;
   void SendKeepAlive(uint8_t payload_type);
 
+  // End to End media crypto
+  bool SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& key);
+  bool MediaEncrypt(rtp::Packet* packet);
+  size_t GetMediaEncryptionOverhead();
+
  protected:
   int32_t CheckPayloadType(int8_t payload_type, RtpVideoCodecTypes* video_type);
 
@@ -329,6 +335,10 @@ class RTPSender {
   OverheadObserver* overhead_observer_;
 
   const bool send_side_bwe_with_overhead_;
+
+  // End to end media encryption
+  bool media_crypto_enabled_;
+  MediaCrypto media_crypto_;
 
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(RTPSender);
 };

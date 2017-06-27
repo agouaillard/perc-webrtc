@@ -147,6 +147,10 @@ class AudioSendStream {
 
   virtual Stats GetStats() const = 0;
 
+  // End to End media encryption
+  virtual bool SetMediaCryptoKey(
+      const rtc::Optional<MediaCryptoKey>& media_crypto_key) = 0;
+
  protected:
   virtual ~AudioSendStream() {}
 };

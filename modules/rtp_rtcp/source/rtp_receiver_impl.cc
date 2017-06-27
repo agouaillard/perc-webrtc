@@ -550,4 +550,8 @@ void RtpReceiverImpl::RemoveOutdatedSources(int64_t now_ms) {
   ssrc_sources_.erase(ssrc_sources_.begin(), vec_it);
 }
 
+bool RtpReceiverImpl::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& key) {
+  return rtp_media_receiver_->SetMediaCryptoKey(key);
+}
 }  // namespace webrtc

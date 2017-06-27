@@ -90,6 +90,10 @@ class VideoSendStream : public webrtc::VideoSendStream {
 
   void SetTransportOverhead(size_t transport_overhead_per_packet);
 
+  // End to end media crypto
+  bool SetMediaCryptoKey(
+      const rtc::Optional<MediaCryptoKey>& media_crypto_key) override;
+
  private:
   class ConstructionTask;
   class DestructAndGetRtpStateTask;

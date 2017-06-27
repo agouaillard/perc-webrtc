@@ -52,6 +52,10 @@ class FakeAudioSendStream final : public webrtc::AudioSendStream {
   TelephoneEvent GetLatestTelephoneEvent() const;
   bool IsSending() const { return sending_; }
   bool muted() const { return muted_; }
+  bool SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey>& media_crypto_key) {
+    return true;
+  }
 
  private:
   // webrtc::AudioSendStream implementation.
@@ -89,6 +93,10 @@ class FakeAudioReceiveStream final : public webrtc::AudioReceiveStream {
                   size_t length,
                   const webrtc::PacketTime& packet_time);
   bool started() const { return started_; }
+  bool SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey>& media_crypto_key) {
+    return true;
+  }
 
  private:
   // webrtc::AudioReceiveStream implementation.
@@ -149,6 +157,10 @@ class FakeVideoSendStream final
   rtc::VideoSourceInterface<webrtc::VideoFrame>* source() const {
     return source_;
   }
+  bool SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey>& media_crypto_key) {
+    return true;
+  }
 
  private:
   // rtc::VideoSinkInterface<VideoFrame> implementation.
@@ -197,6 +209,10 @@ class FakeVideoReceiveStream final : public webrtc::VideoReceiveStream {
 
   void EnableEncodedFrameRecording(rtc::PlatformFile file,
                                    size_t byte_limit) override;
+  bool SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey>& media_crypto_key) {
+    return true;
+  }
 
  private:
   // webrtc::VideoReceiveStream implementation.

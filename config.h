@@ -21,9 +21,18 @@
 #include "webrtc/rtc_base/optional.h"
 #include "webrtc/rtc_base/refcount.h"
 #include "webrtc/rtc_base/scoped_ref_ptr.h"
+#include "webrtc/rtc_base/sslstreamadapter.h"
 #include "webrtc/typedefs.h"
 
 namespace webrtc {
+
+// Settings for NACK, see RFC 4585 for details.
+class MediaCryptoKey {
+ public:
+  int type = rtc::SRTP_INVALID_CRYPTO_SUITE;
+  std::vector<uint8_t> buffer;
+  bool Parse(const std::string& suite, const std::string& str);
+};
 
 // Settings for NACK, see RFC 4585 for details.
 struct NackConfig {

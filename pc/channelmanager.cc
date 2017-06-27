@@ -11,6 +11,7 @@
 #include "webrtc/pc/channelmanager.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "webrtc/media/base/device.h"
 #include "webrtc/media/base/rtpdataengine.h"
@@ -53,18 +54,20 @@ void ChannelManager::Construct(std::unique_ptr<MediaEngineInterface> me,
   network_thread_ = network_thread;
   capturing_ = false;
   enable_rtx_ = false;
+  // Initialize SRTP here to allow calling end to end media crypto stuff
+  InitializeSrtp();
 }
 
 ChannelManager::~ChannelManager() {
   if (initialized_) {
     Terminate();
-    // If srtp is initialized (done by the Channel) then we must call
-    // srtp_shutdown to free all crypto kernel lists. But we need to make sure
-    // shutdown always called at the end, after channels are destroyed.
-    // ChannelManager d'tor is always called last, it's safe place to call
-    // shutdown.
-    ShutdownSrtp();
   }
+  // If srtp is initialized  then we must call
+  // srtp_shutdown to free all crypto kernel lists. But we need to make sure
+  // shutdown always called at the end, after channels are destroyed.
+  // ChannelManager d'tor is always called last, it's safe place to call
+  // shutdown.
+  ShutdownSrtp();
   // The media engine needs to be deleted on the worker thread for thread safe
   // destruction,
   worker_thread_->Invoke<void>(

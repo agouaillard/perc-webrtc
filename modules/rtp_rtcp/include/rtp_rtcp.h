@@ -465,6 +465,12 @@ class RtpRtcp : public Module {
   // Sends a request for a keyframe.
   // Returns -1 on failure else 0.
   virtual int32_t RequestKeyFrame() = 0;
+
+  // **************************************************************************
+  // End to End media encryption
+  // *************************************************************************
+  virtual bool SetMediaCryptoKey(
+      const rtc::Optional<MediaCryptoKey>& media_crypto_key) = 0;
 };
 
 }  // namespace webrtc

@@ -245,6 +245,10 @@ bool RTPSenderAudio::SendAudio(FrameType frame_type,
   if (!rtp_sender_->AssignSequenceNumber(packet.get()))
     return false;
 
+  // End to end media encryption
+  if (!rtp_sender_->MediaEncrypt(packet.get()))
+    return false;
+
   {
     rtc::CritScope cs(&send_audio_critsect_);
     last_payload_type_ = payload_type;

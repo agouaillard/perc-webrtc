@@ -151,11 +151,8 @@ int32_t RTPReceiverAudio::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
     LOG(LS_INFO) << "Received first audio RTP packet";
   }
 
-  return ParseAudioCodecSpecific(rtp_header,
-                                 payload,
-                                 payload_length,
-                                 specific_payload.Audio,
-                                 is_red);
+  return ParseAudioCodecSpecific(rtp_header, payload, payload_length,
+                                 specific_payload.Audio, is_red);
 }
 
 RTPAliveType RTPReceiverAudio::ProcessDeadOrAlive(
@@ -213,7 +210,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
     const AudioPayload& audio_specific,
     bool is_red) {
   RTC_DCHECK_GE(payload_length, rtp_header->header.paddingLength);
-  const size_t payload_data_length =
+  size_t payload_data_length =
       payload_length - rtp_header->header.paddingLength;
   if (payload_data_length == 0) {
     rtp_header->type.Audio.isCNG = false;
@@ -301,9 +298,21 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
     // we recive only one frame packed in a RED packet remove the RED wrapper
     rtp_header->header.payloadType = payload_data[0];
 
+    if (media_crypto_enabled_) {
+      size_t len = payload_data_length - 1;
+      if (!media_crypto_.Decrypt((uint8_t*)payload_data + 1, &len))
+        return -1;
+      payload_data_length = len + 1;
+    }
+
     // only one frame in the RED strip the one byte to help NetEq
     return data_callback_->OnReceivedPayloadData(
         payload_data + 1, payload_data_length - 1, rtp_header);
+  }
+
+  if (media_crypto_enabled_) {
+    if (!media_crypto_.Decrypt((uint8_t*)payload_data, &payload_data_length))
+      return -1;
   }
 
   rtp_header->type.Audio.channel = audio_specific.channels;

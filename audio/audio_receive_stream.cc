@@ -346,5 +346,10 @@ int AudioReceiveStream::SetVoiceEnginePlayout(bool playout) {
     return base->StopPlayout(config_.voe_channel_id);
   }
 }
+
+bool AudioReceiveStream::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) {
+  return channel_proxy_->SetMediaCryptoKey(media_crypto_key);
+}
 }  // namespace internal
 }  // namespace webrtc

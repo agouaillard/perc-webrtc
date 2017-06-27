@@ -11,6 +11,11 @@
 #ifndef WEBRTC_VOICE_ENGINE_CHANNEL_PROXY_H_
 #define WEBRTC_VOICE_ENGINE_CHANNEL_PROXY_H_
 
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "webrtc/api/audio/audio_mixer.h"
 #include "webrtc/api/audio_codecs/audio_encoder.h"
 #include "webrtc/api/rtpreceiverinterface.h"
@@ -20,10 +25,6 @@
 #include "webrtc/rtc_base/thread_checker.h"
 #include "webrtc/voice_engine/channel_manager.h"
 #include "webrtc/voice_engine/include/voe_rtp_rtcp.h"
-
-#include <memory>
-#include <string>
-#include <vector>
 
 namespace webrtc {
 
@@ -125,6 +126,9 @@ class ChannelProxy : public RtpPacketSinkInterface {
       float recoverable_packet_loss_rate);
   virtual void RegisterLegacyReceiveCodecs();
   virtual std::vector<webrtc::RtpSource> GetSources() const;
+  // End to end media crypto
+  virtual bool SetMediaCryptoKey(
+      const rtc::Optional<MediaCryptoKey>& media_crypto_key);
 
  private:
   Channel* channel() const;

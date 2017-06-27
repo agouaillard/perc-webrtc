@@ -289,6 +289,10 @@ class WebRtcVideoChannel : public VideoMediaChannel, public webrtc::Transport {
     VideoSenderInfo GetVideoSenderInfo(bool log_stats);
     void FillBitrateInfo(BandwidthEstimationInfo* bwe_info);
 
+    // End to end media crypto
+    bool SetMediaCryptoKey(
+        const rtc::Optional<webrtc::MediaCryptoKey>& media_crypto_key);
+
    private:
     // Parameters needed to reconstruct the underlying stream.
     // webrtc::VideoSendStream doesn't support setting a lot of options on the
@@ -374,6 +378,9 @@ class WebRtcVideoChannel : public VideoMediaChannel, public webrtc::Transport {
     AllocatedEncoder allocated_encoder_ ACCESS_ON(&thread_checker_);
 
     bool sending_ ACCESS_ON(&thread_checker_);
+
+    // End to End media encryption
+    rtc::Optional<webrtc::MediaCryptoKey> media_crypto_key_;
   };
 
   // Wrapper for the receiver part, contains configs etc. that are needed to
@@ -401,6 +408,7 @@ class WebRtcVideoChannel : public VideoMediaChannel, public webrtc::Transport {
                                bool transport_cc_enabled,
                                webrtc::RtcpMode rtcp_mode);
     void SetRecvParameters(const ChangedRecvParameters& recv_params);
+    bool SetRtpParameters(const webrtc::RtpParameters& parameters);
 
     void OnFrame(const webrtc::VideoFrame& frame) override;
     bool IsDefaultStream() const;
@@ -408,6 +416,10 @@ class WebRtcVideoChannel : public VideoMediaChannel, public webrtc::Transport {
     void SetSink(rtc::VideoSinkInterface<webrtc::VideoFrame>* sink);
 
     VideoReceiverInfo GetVideoReceiverInfo(bool log_stats);
+
+    // End to end media crypto
+    bool SetMediaCryptoKey(
+        const rtc::Optional<webrtc::MediaCryptoKey>& media_crypto_key);
 
    private:
     struct AllocatedDecoder {
@@ -459,6 +471,9 @@ class WebRtcVideoChannel : public VideoMediaChannel, public webrtc::Transport {
     // Start NTP time is estimated as current remote NTP time (estimated from
     // RTCP) minus the elapsed time, as soon as remote NTP time is available.
     int64_t estimated_remote_start_ntp_time_ms_ GUARDED_BY(sink_lock_);
+
+    // End to End media encryption
+    rtc::Optional<webrtc::MediaCryptoKey> media_crypto_key_;
   };
 
   void Construct(webrtc::Call* call, WebRtcVideoEngine* engine);

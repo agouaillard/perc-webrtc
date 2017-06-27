@@ -397,7 +397,8 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
 
   size_t packet_capacity = rtp_sender_->MaxRtpPacketSize() -
                            fec_packet_overhead -
-                           (rtp_sender_->RtxStatus() ? kRtxHeaderSize : 0);
+                           (rtp_sender_->RtxStatus() ? kRtxHeaderSize : 0) -
+                           rtp_sender_->GetMediaEncryptionOverhead();
   RTC_DCHECK_LE(packet_capacity, rtp_header->capacity());
   RTC_DCHECK_GT(packet_capacity, rtp_header->headers_size());
   RTC_DCHECK_GT(packet_capacity, last_packet->headers_size());
@@ -445,6 +446,10 @@ bool RTPSenderVideo::SendVideo(RtpVideoCodecTypes video_type,
     }
 
     if (!rtp_sender_->AssignSequenceNumber(packet.get()))
+      return false;
+
+    // End to End media encryption
+    if (!rtp_sender_->MediaEncrypt(packet.get()))
       return false;
 
     bool protect_packet = (packetizer->GetProtectionType() == kProtectedPacket);

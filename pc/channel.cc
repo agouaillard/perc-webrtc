@@ -563,6 +563,15 @@ int BaseChannel::SetOption_n(SocketType type,
   return transport ? transport->SetOption(opt, value) : -1;
 }
 
+bool BaseChannel::SetMediaCryptoKey(
+    const rtc::Optional<webrtc::MediaCryptoKey>& key) {
+  if (!media_channel_)
+    return false;
+  // Set it on the media channel
+  media_channel_->SetMediaCryptoKey(key);
+  return true;
+}
+
 void BaseChannel::OnWritableState(rtc::PacketTransportInternal* transport) {
   RTC_DCHECK(transport == rtp_transport_->rtp_packet_transport() ||
              transport == rtp_transport_->rtcp_packet_transport());
@@ -1205,7 +1214,6 @@ bool BaseChannel::SetRtcpMux_n(bool enable,
             transport_name_.empty()
                 ? rtp_transport_->rtp_packet_transport()->debug_name()
                 : transport_name_;
-        ;
         LOG(LS_INFO) << "Enabling rtcp-mux for " << content_name()
                      << "; no longer need RTCP transport for " << debug_name;
         if (rtp_transport_->rtcp_packet_transport()) {

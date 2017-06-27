@@ -26,6 +26,11 @@
 
 namespace cricket {
 
+// NOTE: This is called from ChannelManager C'tor.
+void InitializeSrtp() {
+  SrtpSession::Init();
+}
+
 // NOTE: This is called from ChannelManager D'tor.
 void ShutdownSrtp() {
   // If srtp_dealloc is not executed then this will clear all existing sessions.

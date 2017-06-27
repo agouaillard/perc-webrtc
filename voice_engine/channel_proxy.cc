@@ -348,5 +348,15 @@ Channel* ChannelProxy::channel() const {
   return channel_owner_.channel();
 }
 
+bool ChannelProxy::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) {
+  RTC_DCHECK(worker_thread_checker_.CalledOnValidThread());
+  RtpRtcp* rtp_rtcp;
+  RtpReceiver* rtp_receiver;
+  if (channel()->GetRtpRtcp(&rtp_rtcp, &rtp_receiver) != 0)
+    return false;
+  return rtp_rtcp->SetMediaCryptoKey(media_crypto_key) &&
+         rtp_receiver->SetMediaCryptoKey(media_crypto_key);
+}
 }  // namespace voe
 }  // namespace webrtc

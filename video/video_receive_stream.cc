@@ -522,5 +522,10 @@ bool VideoReceiveStream::Decode() {
   }
   return true;
 }
+
+bool VideoReceiveStream::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) {
+  return rtp_video_stream_receiver_.SetMediaCryptoKey(media_crypto_key);
+}
 }  // namespace internal
 }  // namespace webrtc

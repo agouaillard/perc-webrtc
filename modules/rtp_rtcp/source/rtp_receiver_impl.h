@@ -18,6 +18,7 @@
 
 #include "webrtc/modules/rtp_rtcp/include/rtp_receiver.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_receiver_strategy.h"
 #include "webrtc/rtc_base/criticalsection.h"
 #include "webrtc/typedefs.h"
@@ -68,6 +69,9 @@ class RtpReceiverImpl : public RtpReceiver {
   const std::list<RtpSource>& csrc_sources_for_testing() const {
     return csrc_sources_;
   }
+
+  // End to end media encryption
+  bool SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& key) override;
 
  private:
   bool HaveReceivedFrame() const;

@@ -142,6 +142,9 @@ class RtpVideoStreamReceiver : public RtpData,
   rtc::Optional<int64_t> LastReceivedPacketMs() const;
   rtc::Optional<int64_t> LastReceivedKeyframePacketMs() const;
 
+  // End to end media crypto
+  bool SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& media_crypto_key);
+
  private:
   bool AddReceiveCodec(const VideoCodec& video_codec);
   void ReceivePacket(const uint8_t* packet,

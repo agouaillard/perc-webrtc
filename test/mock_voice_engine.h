@@ -240,6 +240,8 @@ class MockVoiceEngine : public VoiceEngineImpl {
   MOCK_METHOD3(GetREDStatus,
                int(int channel, bool& enable, int& redPayloadtype));
   MOCK_METHOD3(SetNACKStatus, int(int channel, bool enable, int maxNoPackets));
+  MOCK_METHOD1(SetMediaCryptoKey,
+               bool(const rtc::Optional<webrtc::MediaCryptoKey>&));
 
  private:
   // TODO(ossu): I'm not particularly happy about keeping the decoder factory

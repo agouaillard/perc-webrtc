@@ -42,4 +42,16 @@ int RTPReceiverStrategy::Energy(uint8_t array_of_energy[kRtpCsrcSize]) const {
   return -1;
 }
 
+bool RTPReceiverStrategy::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& key) {
+  LOG(LS_INFO) << "Setting End to End Media Encryption";
+
+  rtc::CritScope cs(&crit_sect_);
+  if (key) {
+    media_crypto_enabled_ = media_crypto_.SetInboundKey(*key);
+  } else {
+    media_crypto_enabled_ = false;
+  }
+  return media_crypto_enabled_;
+}
 }  // namespace webrtc

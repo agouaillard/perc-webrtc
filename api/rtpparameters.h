@@ -444,11 +444,17 @@ struct RtpParameters {
   DegradationPreference degradation_preference =
       DegradationPreference::BALANCED;
 
+  // End to end media encryption key and cipher suite
+  std::string media_crypto_key;
+  std::string media_crypto_suite;
+
   bool operator==(const RtpParameters& o) const {
     return mid == o.mid && codecs == o.codecs &&
            header_extensions == o.header_extensions &&
            encodings == o.encodings &&
-           degradation_preference == o.degradation_preference;
+           degradation_preference == o.degradation_preference &&
+           media_crypto_key == o.media_crypto_key &&
+           media_crypto_suite == o.media_crypto_suite;
   }
   bool operator!=(const RtpParameters& o) const { return !(*this == o); }
 };

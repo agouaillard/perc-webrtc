@@ -35,6 +35,8 @@ rtc_static_library("rtp_rtcp") {
     "source/forward_error_correction.h",
     "source/forward_error_correction_internal.cc",
     "source/forward_error_correction_internal.h",
+    "source/media_crypto.cc",
+    "source/media_crypto.h",
     "source/packet_loss_stats.cc",
     "source/packet_loss_stats.h",
     "source/playout_delay_oracle.cc",
@@ -180,6 +182,10 @@ rtc_static_library("rtp_rtcp") {
     "../remote_bitrate_estimator",
   ]
 
+  if (rtc_build_libsrtp) {
+    deps += [ "//third_party/libsrtp" ]
+  }
+
   # TODO(jschuh): Bug 1348: fix this warning.
   configs += [ "//build/config/compiler:no_size_t_to_int_warning" ]
 
@@ -234,6 +240,8 @@ if (rtc_include_tests) {
       "test/testFec/average_residual_loss_xor_codes.h",
       "test/testFec/test_packet_masks_metrics.cc",
     ]
+
+    include_dirs = [ "//third_party/libsrtp/srtp" ]
 
     deps = [
       ":rtp_rtcp",

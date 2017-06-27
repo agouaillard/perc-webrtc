@@ -74,6 +74,7 @@ class SrtpSession {
   // been set.
   bool IsExternalAuthActive() const;
 
+  static bool Init();
   // Calls srtp_shutdown if it's initialized.
   static void Terminate();
 
@@ -87,7 +88,6 @@ class SrtpSession {
   // Returns send stream current packet index from srtp db.
   bool GetSendStreamPacketIndex(void* data, int in_len, int64_t* index);
 
-  static bool Init();
   void HandleEvent(const srtp_event_data_t* ev);
   static void HandleEventThunk(srtp_event_data_t* ev);
 

@@ -13,6 +13,7 @@
 
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp.h"
 #include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include "webrtc/modules/rtp_rtcp/source/media_crypto.h"
 #include "webrtc/modules/rtp_rtcp/source/rtp_utility.h"
 #include "webrtc/rtc_base/criticalsection.h"
 #include "webrtc/typedefs.h"
@@ -79,6 +80,9 @@ class RTPReceiverStrategy {
   void GetLastMediaSpecificPayload(PayloadUnion* payload) const;
   void SetLastMediaSpecificPayload(const PayloadUnion& payload);
 
+  // End to end media encryption.
+  virtual bool SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& key);
+
  protected:
   // The data callback is where we should send received payload data.
   // See ParseRtpPacket. This class does not claim ownership of the callback.
@@ -93,6 +97,10 @@ class RTPReceiverStrategy {
   rtc::CriticalSection crit_sect_;
   PayloadUnion last_payload_;
   RtpData* data_callback_;
+
+  // End to end media encryption
+  bool media_crypto_enabled_;
+  MediaCrypto media_crypto_;
 };
 }  // namespace webrtc
 

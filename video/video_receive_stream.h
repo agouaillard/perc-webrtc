@@ -107,6 +107,10 @@ class VideoReceiveStream : public webrtc::VideoReceiveStream,
   uint32_t GetPlayoutTimestamp() const override;
   void SetMinimumPlayoutDelay(int delay_ms) override;
 
+  // End to end media crypto
+  bool SetMediaCryptoKey(
+      const rtc::Optional<MediaCryptoKey>& media_crypto_key) override;
+
  private:
   static void DecodeThreadFunction(void* ptr);
   bool Decode();

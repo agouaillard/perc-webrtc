@@ -199,6 +199,8 @@ class MockRtpRtcp : public RtpRtcp {
   MOCK_CONST_METHOD0(GetSendChannelRtpStatisticsCallback,
                      StreamDataCountersCallback*(void));
   MOCK_METHOD1(SetVideoBitrateAllocation, void(const BitrateAllocation&));
+  MOCK_METHOD1(SetMediaCryptoKey,
+               bool(const rtc::Optional<webrtc::MediaCryptoKey>&));
   // Members.
   unsigned int remote_ssrc_;
 
