@@ -96,6 +96,10 @@ class AudioSendStream final : public webrtc::AudioSendStream,
   RtpState GetRtpState() const;
   const voe::ChannelProxy& GetChannelProxy() const;
 
+  // End to end media crypto
+  bool SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) override;
+
  private:
   class TimedTransport;
 

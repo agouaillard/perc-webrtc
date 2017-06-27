@@ -18,13 +18,13 @@
 #include "modules/audio_processing/vad/pole_zero_filter.h"
 #include "modules/audio_processing/vad/vad_audio_proc_internal.h"
 #include "rtc_base/checks.h"
+#include "modules/include/module_common_types.h"
 extern "C" {
 #include "modules/audio_coding/codecs/isac/main/source/codec.h"
 #include "modules/audio_coding/codecs/isac/main/source/lpc_analysis.h"
 #include "modules/audio_coding/codecs/isac/main/source/pitch_estimator.h"
 #include "modules/audio_coding/codecs/isac/main/source/structs.h"
 }
-#include "modules/include/module_common_types.h"
 
 namespace webrtc {
 

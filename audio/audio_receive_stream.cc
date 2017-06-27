@@ -378,5 +378,10 @@ void AudioReceiveStream::ConfigureStream(AudioReceiveStream* stream,
 
   stream->config_ = new_config;
 }
+
+bool AudioReceiveStream::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) {
+  return channel_proxy_->SetMediaCryptoKey(media_crypto_key);
+}
 }  // namespace internal
 }  // namespace webrtc

@@ -140,7 +140,8 @@ RTPSender::RTPSender(
       retransmission_rate_limiter_(retransmission_rate_limiter),
       overhead_observer_(overhead_observer),
       send_side_bwe_with_overhead_(
-          webrtc::field_trial::IsEnabled("WebRTC-SendSideBwe-WithOverhead")) {
+          webrtc::field_trial::IsEnabled("WebRTC-SendSideBwe-WithOverhead")),
+      media_crypto_enabled_(false) {
   // This random initialization is not intended to be cryptographic strong.
   timestamp_offset_ = random_.Rand<uint32_t>();
   // Random start, 16 bits. Can't be 0.
@@ -1318,5 +1319,28 @@ void RTPSender::SendKeepAlive(uint8_t payload_type) {
 void RTPSender::SetRtt(int64_t rtt_ms) {
   packet_history_.SetRtt(rtt_ms);
   flexfec_packet_history_.SetRtt(rtt_ms);
+}
+bool RTPSender::SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& key) {
+  RTC_LOG(LS_INFO) << "Setting End to End Media Encryption";
+
+  rtc::CritScope cs(&send_critsect_);
+  if (key) {
+    media_crypto_enabled_ = media_crypto_.SetOutboundKey(*key);
+  } else {
+    media_crypto_enabled_ = false;
+  }
+  return media_crypto_enabled_;
+}
+
+bool RTPSender::MediaEncrypt(RtpPacket* packet) {
+  if (media_crypto_enabled_)
+    return media_crypto_.Encrypt(packet);
+  return true;
+}
+
+size_t RTPSender::GetMediaEncryptionOverhead() {
+  if (media_crypto_enabled_)
+    return media_crypto_.GetEncryptionOverhead();
+  return 0;
 }
 }  // namespace webrtc

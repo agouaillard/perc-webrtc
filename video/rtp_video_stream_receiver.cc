@@ -666,4 +666,9 @@ void RtpVideoStreamReceiver::InsertSpsPpsIntoTracker(uint8_t payload_type) {
                              sprop_decoder.pps_nalu());
 }
 
+bool RtpVideoStreamReceiver::SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) {
+  return rtp_rtcp_->SetMediaCryptoKey(media_crypto_key) &&
+         rtp_receiver_->SetMediaCryptoKey(media_crypto_key);
+}
 }  // namespace webrtc

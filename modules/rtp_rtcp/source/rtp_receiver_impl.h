@@ -69,6 +69,9 @@ class RtpReceiverImpl : public RtpReceiver {
     return csrc_sources_;
   }
 
+  // End to end media encryption
+  bool SetMediaCryptoKey(const rtc::Optional<MediaCryptoKey>& key) override;
+
  private:
   void CheckSSRCChanged(const RTPHeader& rtp_header);
   void CheckCSRC(const WebRtcRTPHeader& rtp_header);
