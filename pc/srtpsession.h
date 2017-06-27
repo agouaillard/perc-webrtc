@@ -83,6 +83,10 @@ class SrtpSession {
   // been set.
   bool IsExternalAuthActive() const;
 
+  static bool Init();
+  // Calls srtp_shutdown if it's initialized.
+  static void Terminate();
+
  private:
   bool DoSetKey(int type,
                 int cs,

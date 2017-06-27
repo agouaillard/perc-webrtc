@@ -213,6 +213,9 @@ class BaseChannel
     transport_name_ = transport_name;
   }
 
+  // End to end media encryption
+  bool SetMediaCryptoKey(const rtc::Optional<webrtc::MediaCryptoKey>& key);
+
  protected:
   virtual MediaChannel* media_channel() const { return media_channel_.get(); }
 

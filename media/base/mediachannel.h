@@ -464,6 +464,16 @@ class MediaChannel : public sigslot::has_slots<> {
     return network_interface_->SetOption(type, opt, option);
   }
 
+  virtual void SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey>& key) {
+    media_crypto_key_ = key;
+  }
+
+ protected:
+  const rtc::Optional<webrtc::MediaCryptoKey> media_crypto_key() const {
+    return media_crypto_key_;
+  }
+
  private:
   // This method sets DSCP |value| on both RTP and RTCP channels.
   int SetDscp(rtc::DiffServCodePoint value) {
@@ -496,6 +506,9 @@ class MediaChannel : public sigslot::has_slots<> {
   // of network_interface_ object.
   rtc::CriticalSection network_interface_crit_;
   NetworkInterface* network_interface_;
+
+  // End to end meia encription
+  rtc::Optional<webrtc::MediaCryptoKey> media_crypto_key_;
 };
 
 // The stats information is structured as follows:

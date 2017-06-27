@@ -24,6 +24,7 @@
 #include "call/rtp_config.h"
 #include "modules/audio_processing/include/audio_processing_statistics.h"
 #include "rtc_base/scoped_ref_ptr.h"
+#include "common_types.h"  // NOLINT(build/include)
 #include "typedefs.h"  // NOLINT(build/include)
 
 namespace webrtc {
@@ -154,6 +155,11 @@ class AudioSendStream {
 
   virtual Stats GetStats() const = 0;
   virtual Stats GetStats(bool has_remote_tracks) const = 0;
+
+  // End to End media encryption
+  virtual bool SetMediaCryptoKey(
+      const rtc::Optional<MediaCryptoKey>& media_crypto_key) = 0;
+
 };
 }  // namespace webrtc
 

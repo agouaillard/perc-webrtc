@@ -90,6 +90,10 @@ class AudioReceiveStream final : public webrtc::AudioReceiveStream,
   const webrtc::AudioReceiveStream::Config& config() const;
   const AudioSendStream* GetAssociatedSendStreamForTesting() const;
 
+  // End to end media crypto
+  bool SetMediaCryptoKey(
+    const rtc::Optional<MediaCryptoKey>& media_crypto_key) override;
+
  private:
   static void ConfigureStream(AudioReceiveStream* stream,
                               const Config& new_config,

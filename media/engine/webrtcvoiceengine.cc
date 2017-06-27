@@ -981,6 +981,20 @@ class WebRtcVoiceMediaChannel::WebRtcAudioSendStream
     bool reconfigure_send_stream =
         (rtp_parameters_.encodings[0].max_bitrate_bps != old_rtp_max_bitrate) ||
         (rtp_parameters_.encodings[0].bitrate_priority != old_priority);
+    // Parse E2E media crypto key
+    if (!rtp_parameters_.media_crypto_key.empty() &&
+        !rtp_parameters_.media_crypto_suite.empty()) {
+      webrtc::MediaCryptoKey key;
+      if (!key.Parse(rtp_parameters_.media_crypto_suite,
+                     rtp_parameters_.media_crypto_key))
+        return false;
+      RTC_LOG(LS_INFO) << "Enabling E2E Media Encryption with key "
+                   << rtp_parameters_.media_crypto_key << " and suite "
+                   << rtp_parameters_.media_crypto_suite;
+
+      SetMediaCryptoKey(rtc::Optional<webrtc::MediaCryptoKey>(key));
+    }
+
     if (rtp_parameters_.encodings[0].max_bitrate_bps != old_rtp_max_bitrate) {
       // Update the bitrate range.
       if (send_rate) {
@@ -994,6 +1008,12 @@ class WebRtcVoiceMediaChannel::WebRtcAudioSendStream
     // parameters.encodings[0].active could have changed.
     UpdateSendState();
     return true;
+  }
+
+  bool SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey> media_crypto_key) {
+    RTC_DCHECK(stream_);
+    return stream_->SetMediaCryptoKey(media_crypto_key);
   }
 
  private:
@@ -1224,6 +1244,32 @@ class WebRtcVoiceMediaChannel::WebRtcAudioReceiveStream {
     RTC_DCHECK(worker_thread_checker_.CalledOnValidThread());
     RTC_DCHECK(stream_);
     return stream_->GetSources();
+  }
+
+  bool SetRtpParameters(const webrtc::RtpParameters& parameters) {
+    // TODO(deadbeef): Update the rest of rtp parameters accordingly
+
+    // Parse E2E media crypto key
+    if (!parameters.media_crypto_key.empty() &&
+        !parameters.media_crypto_suite.empty()) {
+      webrtc::MediaCryptoKey key;
+      if (!key.Parse(parameters.media_crypto_suite,
+                     parameters.media_crypto_key))
+        return false;
+      RTC_LOG(LS_INFO) << "Enabling E2E Media Encryption with key "
+                   << parameters.media_crypto_key << " and suite "
+                   << parameters.media_crypto_suite;
+
+      SetMediaCryptoKey(rtc::Optional<webrtc::MediaCryptoKey>(key));
+    }
+
+    return true;
+  }
+
+  bool SetMediaCryptoKey(
+      const rtc::Optional<webrtc::MediaCryptoKey> media_crypto_key) {
+    RTC_DCHECK(stream_);
+    return stream_->SetMediaCryptoKey(media_crypto_key);
   }
 
  private:
@@ -1787,6 +1833,10 @@ bool WebRtcVoiceMediaChannel::AddSendStream(const StreamParams& sp) {
       call_,
       this,
       engine()->encoder_factory_);
+
+  // End to End Media Encryption
+  stream->SetMediaCryptoKey(media_crypto_key());
+
   send_streams_.insert(std::make_pair(ssrc, stream));
 
   // At this point the stream's local SSRC has been updated. If it is the first
@@ -1859,9 +1909,8 @@ bool WebRtcVoiceMediaChannel::AddRecvStream(const StreamParams& sp) {
   }
 
   // Create a new channel for receiving audio data.
-  recv_streams_.insert(std::make_pair(
-      ssrc,
-      new WebRtcAudioReceiveStream(
+
+  WebRtcAudioReceiveStream* stream = new WebRtcAudioReceiveStream(
           ssrc,
           receiver_reports_ssrc_,
           recv_transport_cc_enabled_,
@@ -1873,7 +1922,9 @@ bool WebRtcVoiceMediaChannel::AddRecvStream(const StreamParams& sp) {
           engine()->decoder_factory_,
           decoder_map_,
           engine()->audio_jitter_buffer_max_packets_,
-          engine()->audio_jitter_buffer_fast_accelerate_)));
+          engine()->audio_jitter_buffer_fast_accelerate_);
+  stream->SetMediaCryptoKey(media_crypto_key());
+  recv_streams_.insert(std::make_pair(ssrc, stream));
   recv_streams_[ssrc]->SetPlayout(playout_);
 
   return true;

@@ -63,7 +63,7 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
       specific_payload.video_payload().videoCodecType;
 
   RTC_DCHECK_GE(payload_length, rtp_header->header.paddingLength);
-  const size_t payload_data_length =
+  size_t payload_data_length =
       payload_length - rtp_header->header.paddingLength;
 
   if (payload == NULL || payload_data_length == 0) {
@@ -81,6 +81,11 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
   if (depacketizer.get() == NULL) {
     RTC_LOG(LS_ERROR) << "Failed to create depacketizer.";
     return -1;
+  }
+
+  if (media_crypto_enabled_) {
+    if (!media_crypto_.Decrypt((uint8_t*)payload, &payload_data_length))
+      return -1;
   }
 
   RtpDepacketizer::ParsedPayload parsed_payload;

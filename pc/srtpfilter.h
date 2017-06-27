@@ -34,6 +34,8 @@ struct srtp_ctx_t_;
 namespace cricket {
 
 // A helper class used to negotiate SDES crypto params.
+void InitializeSrtp();
+void ShutdownSrtp();
 // TODO(zhihuang): Find a better name for this class, like "SdesNegotiator".
 class SrtpFilter {
  public:

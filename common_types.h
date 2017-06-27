@@ -21,6 +21,7 @@
 #include "api/optional.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/deprecation.h"
+#include "rtc_base/sslstreamadapter.h"
 #include "typedefs.h"  // NOLINT(build/include)
 
 #if defined(_MSC_VER)
@@ -680,6 +681,15 @@ struct PacketTime {
 struct PlayoutDelay {
   int min_ms;
   int max_ms;
+};
+
+class MediaCryptoKey {
+ public:
+  MediaCryptoKey();
+  ~MediaCryptoKey();
+  int type = rtc::SRTP_INVALID_CRYPTO_SUITE;
+  std::vector<uint8_t> buffer;
+  bool Parse(const std::string& suite, const std::string& str);
 };
 
 }  // namespace webrtc
