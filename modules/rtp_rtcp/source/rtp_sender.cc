@@ -1319,4 +1319,17 @@ void RTPSender::SetRtt(int64_t rtt_ms) {
   packet_history_.SetRtt(rtt_ms);
   flexfec_packet_history_.SetRtt(rtt_ms);
 }
+
+bool RTPSender::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  RTC_LOG(LS_INFO) << "Setting End to End Media Encryption";
+  rtc::CritScope cs(&send_critsect_);
+  media_crypto_ = media_crypto;
+  return true;
+}
+
+const std::shared_ptr<webrtc::MediaCrypto>& RTPSender::GetMediaCrypto() const {
+  return media_crypto_;
+}
+
 }  // namespace webrtc

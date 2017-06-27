@@ -154,6 +154,11 @@ class AudioSendStream {
 
   virtual Stats GetStats() const = 0;
   virtual Stats GetStats(bool has_remote_tracks) const = 0;
+
+  // End to End media encryption
+  virtual bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) = 0;
+
 };
 }  // namespace webrtc
 

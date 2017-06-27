@@ -79,6 +79,9 @@ class RTPReceiverStrategy {
   void GetLastMediaSpecificPayload(PayloadUnion* payload) const;
   void SetLastMediaSpecificPayload(const PayloadUnion& payload);
 
+  // End to end media encryption.
+  virtual bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+
  protected:
   // The data callback is where we should send received payload data.
   // See ParseRtpPacket. This class does not claim ownership of the callback.
@@ -93,6 +96,9 @@ class RTPReceiverStrategy {
   rtc::CriticalSection crit_sect_;
   rtc::Optional<PayloadUnion> last_payload_;
   RtpData* data_callback_;
+
+  // End to end media encryption.
+  std::shared_ptr<webrtc::MediaCrypto> media_crypto_;
 };
 }  // namespace webrtc
 

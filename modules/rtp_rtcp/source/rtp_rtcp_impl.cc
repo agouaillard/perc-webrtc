@@ -928,4 +928,14 @@ void ModuleRtpRtcpImpl::SetVideoBitrateAllocation(
     const BitrateAllocation& bitrate) {
   rtcp_sender_.SetVideoBitrateAllocation(bitrate);
 }
+
+bool ModuleRtpRtcpImpl::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  if (rtp_sender_) {
+    // Set end to end media encryption.
+    return rtp_sender_->SetMediaCrypto(media_crypto);
+  }
+  return true;
+}
+
 }  // namespace webrtc

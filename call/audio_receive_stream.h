@@ -145,6 +145,10 @@ class AudioReceiveStream {
 
   virtual std::vector<RtpSource> GetSources() const = 0;
 
+  // End to End media encryption.
+  virtual bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) = 0;
+
  protected:
   virtual ~AudioReceiveStream() {}
 };

@@ -35,6 +35,8 @@ ChannelManager::ChannelManager(
   RTC_DCHECK(data_engine_);
   RTC_DCHECK(worker_thread_);
   RTC_DCHECK(network_thread_);
+  // Initialize SRTP here to allow calling end to end media crypto stuff
+  InitializeSrtp();
 }
 
 ChannelManager::~ChannelManager() {

@@ -591,6 +591,7 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
     rtc::Optional<rtc::IntervalRange> ice_regather_interval_range;
     webrtc::TurnCustomizer* turn_customizer;
     SdpSemantics sdp_semantics;
+    std::shared_ptr<webrtc::MediaCrypto> media_crypto;
   };
   static_assert(sizeof(stuff_being_tested_for_equality) == sizeof(*this),
                 "Did you add something to RTCConfiguration and forget to "
@@ -627,7 +628,8 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
          ice_check_min_interval == o.ice_check_min_interval &&
          ice_regather_interval_range == o.ice_regather_interval_range &&
          turn_customizer == o.turn_customizer &&
-         sdp_semantics == o.sdp_semantics;
+         sdp_semantics == o.sdp_semantics &&
+         media_crypto == o.media_crypto;
 }
 
 bool PeerConnectionInterface::RTCConfiguration::operator!=(
@@ -780,7 +782,11 @@ bool PeerConnection::Initialize(
     RTC_LOG(LS_ERROR) << "Invalid configuration: " << config_error.message();
     return false;
   }
-
+  // Check E2E media crypto key
+  if (configuration.media_crypto) {
+    RTC_LOG(LS_INFO) << "Enabling E2E Media Encryption with";
+    media_crypto_ = configuration.media_crypto;
+  }
   if (!allocator) {
     RTC_LOG(LS_ERROR)
         << "PeerConnection initialized without a PortAllocator? "
@@ -4995,7 +5001,8 @@ cricket::VoiceChannel* PeerConnection::CreateVoiceChannel(
       this, &PeerConnection::OnDtlsSrtpSetupFailure);
   voice_channel->SignalSentPacket.connect(this,
                                           &PeerConnection::OnSentPacket_w);
-
+  if (media_crypto_)
+    voice_channel->SetMediaCrypto(media_crypto_);
   return voice_channel;
 }
 
@@ -5033,6 +5040,8 @@ cricket::VideoChannel* PeerConnection::CreateVideoChannel(
       this, &PeerConnection::OnDtlsSrtpSetupFailure);
   video_channel->SignalSentPacket.connect(this,
                                           &PeerConnection::OnSentPacket_w);
+  if (media_crypto_)
+    video_channel->SetMediaCrypto(media_crypto_);
 
   return video_channel;
 }

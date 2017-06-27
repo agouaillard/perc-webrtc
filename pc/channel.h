@@ -213,6 +213,9 @@ class BaseChannel
     transport_name_ = transport_name;
   }
 
+  // End to end media encryption.
+  bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+
  protected:
   virtual MediaChannel* media_channel() const { return media_channel_.get(); }
 
