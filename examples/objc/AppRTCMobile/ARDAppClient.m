@@ -543,7 +543,7 @@ static int const kKbpsMultiplier = 1000;
   RTCConfiguration *config = [[RTCConfiguration alloc] init];
   config.iceServers = _iceServers;
 #ifdef HAVE_MEDIA_CRYPTO_KEY
-  config.mediaCryptoKey = [[self class] generateSecureUUID:32];
+  config.mediaCryptoKey = @"VEhJUyBJUyBUSEUgMzIgS0VZIFdJVEggMTIgU0FMVCBET1VCTEUgUEVSQyE="; // [[self class] generateSecureUUID:32];
 #endif
   _peerConnection = [_factory peerConnectionWithConfiguration:config
                                                   constraints:constraints

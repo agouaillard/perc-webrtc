@@ -64,6 +64,7 @@ import org.webrtc.voiceengine.WebRtcAudioUtils;
  * This class is a singleton.
  */
 public class PeerConnectionClient {
+  private static final boolean HAVE_MEDIA_CRYPTO_KEY = true; // Enable/Disable perc
   public static final String VIDEO_TRACK_ID = "ARDAMSv0";
   public static final String AUDIO_TRACK_ID = "ARDAMSa0";
   public static final String VIDEO_TRACK_TYPE = "video";
@@ -554,6 +555,9 @@ public class PeerConnectionClient {
     rtcConfig.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY;
     // Use ECDSA encryption.
     rtcConfig.keyType = PeerConnection.KeyType.ECDSA;
+    if (PeerConnectionClient.HAVE_MEDIA_CRYPTO_KEY) {
+      rtcConfig.mediaCryptoKey = "VEhJUyBJUyBUSEUgMzIgS0VZIFdJVEggMTIgU0FMVCBET1VCTEUgUEVSQyE=";
+    }
 
     peerConnection = factory.createPeerConnection(rtcConfig, pcConstraints, pcObserver);
 
