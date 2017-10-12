@@ -4,10 +4,6 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>.DS_Store</key>
-		<data>
-		UQ5cAiLWEy44IBcCUBT1onb77vg=
-		</data>
 		<key>Headers/RTCAVFoundationVideoSource.h</key>
 		<data>
 		vo+mkF8V79zvrL0rwO8rciNuLL8=
@@ -23,10 +19,6 @@
 		<key>Headers/RTCCameraPreviewView.h</key>
 		<data>
 		1CrQimcYi4XXPUTKoOxUMKUFvbk=
-		</data>
-		<key>Headers/RTCCameraVideoCapturer.h</key>
-		<data>
-		pPV4yBlIZ6i1ZCCK5ivFMvj/dj0=
 		</data>
 		<key>Headers/RTCConfiguration.h</key>
 		<data>
@@ -71,10 +63,6 @@
 		<key>Headers/RTCLogging.h</key>
 		<data>
 		eDULSfPiioMRZKLKRe4HgFZUtaw=
-		</data>
-		<key>Headers/RTCMTLVideoView.h</key>
-		<data>
-		Mv7I0jsas62l1Ck923qeu4SFYXw=
 		</data>
 		<key>Headers/RTCMacros.h</key>
 		<data>
@@ -144,10 +132,6 @@
 		<data>
 		E74UZ4bd27W6EXt2vnonUa2mbSI=
 		</data>
-		<key>Headers/RTCVideoCapturer.h</key>
-		<data>
-		Yr/1QAKqm2eTT4wz1ljI1ytUvTE=
-		</data>
 		<key>Headers/RTCVideoFrame.h</key>
 		<data>
 		+TtndRnFm6ltP4o8hacOgMkYV+M=
@@ -174,7 +158,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		FsEt+FkbbMCVlmGy2+q0G0hiCBA=
+		NQO1yvNsVG4R3+pYZZeQ8Xz7Iy0=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -225,17 +209,6 @@
 			<key>hash2</key>
 			<data>
 			6Lo9EP4IXm/ehWaFi+Ufoq+t9d/OuubZus/laNLTP1g=
-			</data>
-		</dict>
-		<key>Headers/RTCCameraVideoCapturer.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			pPV4yBlIZ6i1ZCCK5ivFMvj/dj0=
-			</data>
-			<key>hash2</key>
-			<data>
-			8UUO1fCIDs7DFVFneyKGwkYftcsPB+3vrXgZ+wSYd28=
 			</data>
 		</dict>
 		<key>Headers/RTCConfiguration.h</key>
@@ -357,17 +330,6 @@
 			<key>hash2</key>
 			<data>
 			jiUJ1cWcHG5rA+W2PBRGSJbdzMwIxGSXB2cOnp6HeTE=
-			</data>
-		</dict>
-		<key>Headers/RTCMTLVideoView.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			Mv7I0jsas62l1Ck923qeu4SFYXw=
-			</data>
-			<key>hash2</key>
-			<data>
-			kB0EuCqWus8D67Xdl4mR8dQhKPztAJ6itj7uiiuN4h8=
 			</data>
 		</dict>
 		<key>Headers/RTCMacros.h</key>
@@ -555,17 +517,6 @@
 			<key>hash2</key>
 			<data>
 			jdu4Uy1v6SJUCcJe8OuE8bme0PdhdquLNxbAq/VZHC8=
-			</data>
-		</dict>
-		<key>Headers/RTCVideoCapturer.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			Yr/1QAKqm2eTT4wz1ljI1ytUvTE=
-			</data>
-			<key>hash2</key>
-			<data>
-			grUwJwLo7gjdMRKhj0+afbvE5LwGXFLJfzTJRvRd4uE=
 			</data>
 		</dict>
 		<key>Headers/RTCVideoFrame.h</key>

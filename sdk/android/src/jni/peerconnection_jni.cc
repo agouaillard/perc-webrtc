@@ -1757,6 +1757,11 @@ static void JavaRTCConfigurationToJsepRTCConfiguration(
 
   jfieldID j_prune_turn_ports_id =
       GetFieldID(jni, j_rtc_config_class, "pruneTurnPorts", "Z");
+    
+  jfieldID j_media_crypto_key_id =
+      GetFieldID(jni, j_rtc_config_class, "mediaCryptoKey", "Ljava/lang/String;");
+  jobject j_media_crypto_key =
+      GetNullableObjectField(jni, j_rtc_config, j_media_crypto_key_id);
 
   rtc_config->type =
       JavaIceTransportsTypeToNativeType(jni, j_ice_transports_type);
@@ -1786,6 +1791,11 @@ static void JavaRTCConfigurationToJsepRTCConfiguration(
       GetBooleanField(jni, j_rtc_config, j_prune_turn_ports_id);
   rtc_config->presume_writable_when_fully_relayed = GetBooleanField(
       jni, j_rtc_config, j_presume_writable_when_fully_relayed_id);
+    
+  if (!IsNull(jni, j_media_crypto_key)) {
+      rtc_config->->media_crypto_key =
+          JavaToStdString(jni, GetStringField(jni, j_rtc_config, j_media_crypto_key_id));
+  }
 }
 
 JOW(jlong, PeerConnectionFactory_nativeCreatePeerConnection)(
