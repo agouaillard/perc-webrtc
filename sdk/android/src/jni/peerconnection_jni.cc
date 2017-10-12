@@ -1793,7 +1793,7 @@ static void JavaRTCConfigurationToJsepRTCConfiguration(
       jni, j_rtc_config, j_presume_writable_when_fully_relayed_id);
     
   if (!IsNull(jni, j_media_crypto_key)) {
-      rtc_config->->media_crypto_key =
+      rtc_config->media_crypto_key =
           JavaToStdString(jni, GetStringField(jni, j_rtc_config, j_media_crypto_key_id));
   }
 }
