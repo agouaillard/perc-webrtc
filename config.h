@@ -28,6 +28,8 @@ namespace webrtc {
 
 // End to end media encryption	
 struct MediaCryptoKey {
+  MediaCryptoKey();
+  ~MediaCryptoKey();
   int type = rtc::SRTP_INVALID_CRYPTO_SUITE;
   std::vector<uint8_t> buffer;
   bool Parse(int crypto_suite, const std::string &str);

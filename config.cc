@@ -15,6 +15,10 @@
 #include "webrtc/base/checks.h"
 
 namespace webrtc {
+    
+MediaCryptoKey::MediaCryptoKey(){};
+MediaCryptoKey::~MediaCryptoKey(){};
+    
 std::string NackConfig::ToString() const {
   std::stringstream ss;
   ss << "{rtp_history_ms: " << rtp_history_ms;
