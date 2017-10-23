@@ -514,6 +514,10 @@ class PeerConnectionInterface : public rtc::RefCountInterface {
     // TODO(steveanton): Implement support for kUnifiedPlan.
     SdpSemantics sdp_semantics = SdpSemantics::kDefault;
 
+    // End to end media encryption key and cipher suite
+    std::string media_crypto_key;
+    std::string media_crypto_suite;
+
     //
     // Don't forget to update operator== if adding something.
     //
