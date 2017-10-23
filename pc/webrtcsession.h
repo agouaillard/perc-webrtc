@@ -643,6 +643,8 @@ class WebRtcSession :
   std::unique_ptr<QuicDataTransport> quic_data_transport_;
 #endif  // HAVE_QUIC
 
+  rtc::Optional<MediaCryptoKey> media_crypto_key_;
+    
   RTC_DISALLOW_COPY_AND_ASSIGN(WebRtcSession);
 };
 }  // namespace webrtc

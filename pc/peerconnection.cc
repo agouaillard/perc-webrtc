@@ -260,6 +260,8 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
     bool redetermine_role_on_ice_restart;
     rtc::Optional<int> ice_check_min_interval;
     rtc::Optional<rtc::IntervalRange> ice_regather_interval_range;
+    std::string media_crypto_key;
+    std::string media_crypto_suite;
   };
   static_assert(sizeof(stuff_being_tested_for_equality) == sizeof(*this),
                 "Did you add something to RTCConfiguration and forget to "
@@ -294,7 +296,9 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
          enable_ice_renomination == o.enable_ice_renomination &&
          redetermine_role_on_ice_restart == o.redetermine_role_on_ice_restart &&
          ice_check_min_interval == o.ice_check_min_interval &&
-         ice_regather_interval_range == o.ice_regather_interval_range;
+         ice_regather_interval_range == o.ice_regather_interval_range &&
+	 media_crypto_suite == o.media_crypto_suite &&
+         media_crypto_key == o.media_crypto_key;
 }
 
 bool PeerConnectionInterface::RTCConfiguration::operator!=(

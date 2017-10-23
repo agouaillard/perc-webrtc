@@ -460,6 +460,10 @@ class PeerConnectionInterface : public rtc::RefCountInterface {
     // interval specified in milliseconds by the uniform distribution [a, b].
     rtc::Optional<rtc::IntervalRange> ice_regather_interval_range;
 
+    // End to end media encryption key and cipher suite
+    std::string media_crypto_key;
+    std::string media_crypto_suite;
+    
     //
     // Don't forget to update operator== if adding something.
     //

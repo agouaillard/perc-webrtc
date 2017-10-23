@@ -537,6 +537,19 @@ bool WebRtcSession::Initialize(
     const PeerConnectionFactoryInterface::Options& options,
     std::unique_ptr<rtc::RTCCertificateGeneratorInterface> cert_generator,
     const PeerConnectionInterface::RTCConfiguration& rtc_configuration) {
+  // Parse E2E media crypto key
+  if (!rtc_configuration.media_crypto_key.empty() &&
+      !rtc_configuration.media_crypto_suite.empty()) {
+    MediaCryptoKey key;
+    if (!key.Parse(rtc_configuration.media_crypto_suite,
+                   rtc_configuration.media_crypto_key))
+      return false;
+    LOG(LS_INFO) << "Enabling E2E Media Encryption with key "
+                 << rtc_configuration.media_crypto_key << " and suite "
+                 << rtc_configuration.media_crypto_suite;
+    media_crypto_key_ = rtc::Optional<MediaCryptoKey>(key);
+  }
+  
   bundle_policy_ = rtc_configuration.bundle_policy;
   rtcp_mux_policy_ = rtc_configuration.rtcp_mux_policy;
   transport_controller_->SetSslMaxProtocolVersion(options.ssl_max_version);
@@ -1785,6 +1798,8 @@ bool WebRtcSession::CreateVoiceChannel(const cricket::ContentInfo* content,
   voice_channel_->SignalDtlsSrtpSetupFailure.connect(
       this, &WebRtcSession::OnDtlsSrtpSetupFailure);
 
+  voice_channel_->SetMediaCryptoKey(media_crypto_key_);
+
   SignalVoiceChannelCreated();
   voice_channel_->SignalSentPacket.connect(this,
                                            &WebRtcSession::OnSentPacket_w);
@@ -1822,6 +1837,8 @@ bool WebRtcSession::CreateVideoChannel(const cricket::ContentInfo* content,
     }
     return false;
   }
+
+  video_channel_->SetMediaCryptoKey(media_crypto_key_);
 
   video_channel_->SignalRtcpMuxFullyActive.connect(
       this, &WebRtcSession::DestroyRtcpTransport_n);
