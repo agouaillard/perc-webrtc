@@ -591,6 +591,8 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
     rtc::Optional<rtc::IntervalRange> ice_regather_interval_range;
     webrtc::TurnCustomizer* turn_customizer;
     SdpSemantics sdp_semantics;
+    std::string media_crypto_key;
+    std::string media_crypto_suite;
   };
   static_assert(sizeof(stuff_being_tested_for_equality) == sizeof(*this),
                 "Did you add something to RTCConfiguration and forget to "
@@ -627,7 +629,9 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
          ice_check_min_interval == o.ice_check_min_interval &&
          ice_regather_interval_range == o.ice_regather_interval_range &&
          turn_customizer == o.turn_customizer &&
-         sdp_semantics == o.sdp_semantics;
+         sdp_semantics == o.sdp_semantics &&
+         media_crypto_suite == o.media_crypto_suite &&
+         media_crypto_key == o.media_crypto_key;
 }
 
 bool PeerConnectionInterface::RTCConfiguration::operator!=(
@@ -780,7 +784,18 @@ bool PeerConnection::Initialize(
     RTC_LOG(LS_ERROR) << "Invalid configuration: " << config_error.message();
     return false;
   }
-
+  // Parse E2E media crypto key
+  if (!configuration.media_crypto_key.empty() &&
+       !configuration.media_crypto_suite.empty()) {
+    MediaCryptoKey key;
+    if (!key.Parse(configuration.media_crypto_suite,
+        configuration.media_crypto_key))
+        return false;
+    RTC_LOG(LS_INFO) << "Enabling E2E Media Encryption with key "
+       << configuration.media_crypto_key << " and suite "
+       << configuration.media_crypto_suite;
+    media_crypto_key_ = rtc::Optional<MediaCryptoKey>(key);
+  }
   if (!allocator) {
     RTC_LOG(LS_ERROR)
         << "PeerConnection initialized without a PortAllocator? "
@@ -4995,7 +5010,8 @@ cricket::VoiceChannel* PeerConnection::CreateVoiceChannel(
       this, &PeerConnection::OnDtlsSrtpSetupFailure);
   voice_channel->SignalSentPacket.connect(this,
                                           &PeerConnection::OnSentPacket_w);
-
+  if (media_crypto_key_)
+    voice_channel->SetMediaCryptoKey(media_crypto_key_);
   return voice_channel;
 }
 
@@ -5033,6 +5049,8 @@ cricket::VideoChannel* PeerConnection::CreateVideoChannel(
       this, &PeerConnection::OnDtlsSrtpSetupFailure);
   video_channel->SignalSentPacket.connect(this,
                                           &PeerConnection::OnSentPacket_w);
+  if (media_crypto_key_)
+    video_channel->SetMediaCryptoKey(media_crypto_key_);
 
   return video_channel;
 }
