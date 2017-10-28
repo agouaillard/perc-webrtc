@@ -132,7 +132,7 @@ class RelayPortTest : public testing::Test,
   // connection has failed, the RelayPort will attempt to connect via
   // TCP. Here we add a fake UDP address together with a real TCP
   // address to simulate an UDP failure. As soon as UDP has failed the
-  // RelayPort will try the TCP adress and succed.
+  // RelayPort will try the TCP adress and succeed.
   void TestConnectTcp() {
     // Create a fake UDP address for relay port to simulate a failure.
     cricket::ProtocolAddress fake_protocol_address =
