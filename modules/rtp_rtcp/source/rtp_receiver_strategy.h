@@ -99,7 +99,7 @@ class RTPReceiverStrategy {
   RtpData* data_callback_;
 
   // End to end media encryption
-  bool media_crypto_enabled_;
+  bool media_crypto_enabled_ = false;
   MediaCrypto media_crypto_;
 };
 }  // namespace webrtc
