@@ -1028,6 +1028,9 @@ class PeerConnection : public PeerConnectionInterface,
   // Member variables for caching global options.
   cricket::AudioOptions audio_options_;
   cricket::VideoOptions video_options_;
+
+  // E2E Media crypto
+  rtc::Optional<MediaCryptoKey> media_crypto_key_;
 };
 
 }  // namespace webrtc
