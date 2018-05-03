@@ -17,6 +17,7 @@ namespace webrtc {
 
 class MediaCrypto {
  public:
+  virtual ~MediaCrypto() {};
   virtual bool Encrypt(cricket::MediaType type, uint32_t ssrc, bool first,
                        bool last, bool is_intra, uint8_t* payload,
                        size_t* payload_size) = 0;
