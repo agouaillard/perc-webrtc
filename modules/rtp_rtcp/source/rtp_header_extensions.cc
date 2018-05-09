@@ -462,7 +462,8 @@ bool FrameMarking::Write(uint8_t* data, const FrameMarks& frame_marks) {
   // Check if it is scalable.
   if (IsScalable(frame_marks)) {
     data[0] |= frame_marks.base_layer_sync ? 0x08 : 0x00;
-    data[0] |= (frame_marks.temporal_layer_id & 0x07);
+    if (frame_marks.temporal_layer_id != kNoTemporalIdx)
+      data[0] |=  frame_marks.temporal_layer_id & 0x07;
     data[1] = frame_marks.layer_id;
     data[2] = static_cast<uint8_t>(frame_marks.tl0_pic_idx);
   }
