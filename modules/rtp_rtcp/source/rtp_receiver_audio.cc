@@ -298,7 +298,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
 
     if (media_crypto_) {
       size_t len = payload_data_length - 1;
-      if (!media_crypto_->Decrypt(cricket::MediaType::MEDIA_TYPE_VIDEO,
+      if (!media_crypto_->Decrypt(cricket::MediaType::MEDIA_TYPE_AUDIO,
                                   rtp_header->header.ssrc,
                                   (uint8_t*)payload_data + 1, &len))
         return -1;
@@ -312,7 +312,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
 
   rtp_header->type.Audio.channel = audio_specific.format.num_channels;
   if (media_crypto_) {
-    if (!media_crypto_->Decrypt(cricket::MediaType::MEDIA_TYPE_VIDEO,
+    if (!media_crypto_->Decrypt(cricket::MediaType::MEDIA_TYPE_AUDIO,
                                 rtp_header->header.ssrc,(uint8_t*)payload_data,
                                 &payload_data_length))
       return -1;
