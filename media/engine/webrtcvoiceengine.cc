@@ -1253,6 +1253,7 @@ class WebRtcVoiceMediaChannel::WebRtcAudioReceiveStream {
   bool SetMediaCrypto(
       const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
     RTC_DCHECK(stream_);
+    media_crypto_ = media_crypto;
     return stream_->SetMediaCrypto(media_crypto);
   }
 
@@ -1264,6 +1265,8 @@ class WebRtcVoiceMediaChannel::WebRtcAudioReceiveStream {
     }
     stream_ = call_->CreateAudioReceiveStream(config_);
     RTC_CHECK(stream_);
+    // End to End media encryption
+    stream_->SetMediaCrypto(media_crypto_);
     SetPlayout(playout_);
     stream_->SetSink(raw_audio_sink_.get());
   }
@@ -1282,7 +1285,10 @@ class WebRtcVoiceMediaChannel::WebRtcAudioReceiveStream {
   webrtc::AudioReceiveStream* stream_ = nullptr;
   bool playout_ = false;
   std::unique_ptr<webrtc::AudioSinkInterface> raw_audio_sink_;
-
+  
+  // End to End media encryption.
+  std::shared_ptr<webrtc::MediaCrypto> media_crypto_;
+  
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(WebRtcAudioReceiveStream);
 };
 
