@@ -87,6 +87,10 @@ class SrtpSession {
   void SetMetricsObserver(
       rtc::scoped_refptr<webrtc::MetricsObserverInterface> metrics_observer);
 
+  static bool Init();
+  // Calls srtp_shutdown if it's initialized.
+  static void Terminate();
+
  private:
   bool DoSetKey(int type,
                 int cs,

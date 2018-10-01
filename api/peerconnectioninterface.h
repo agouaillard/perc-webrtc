@@ -570,6 +570,9 @@ class PeerConnectionInterface : public rtc::RefCountInterface {
     // correctly. This flag will be deprecated soon. Do not rely on it.
     bool active_reset_srtp_params = false;
 
+    // End to end media crypto
+    std::shared_ptr<webrtc::MediaCrypto> media_crypto;
+
     //
     // Don't forget to update operator== if adding something.
     //

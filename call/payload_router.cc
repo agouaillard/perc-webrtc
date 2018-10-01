@@ -542,4 +542,12 @@ std::map<uint32_t, RtpPayloadState> PayloadRouter::GetRtpPayloadStates() const {
   }
   return payload_states;
 }
+
+bool PayloadRouter::SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  bool result = true;
+  for (auto& rtp_rtcp : rtp_modules_) {
+    result &= rtp_rtcp->SetMediaCrypto(media_crypto);
+  }
+  return result;
+}
 }  // namespace webrtc

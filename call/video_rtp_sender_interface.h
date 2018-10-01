@@ -55,6 +55,9 @@ class VideoRtpSenderInterface : public EncodedImageCallback {
   virtual void SetMaxRtpPacketSize(size_t max_rtp_packet_size) = 0;
   virtual void OnBitrateAllocationUpdated(
       const VideoBitrateAllocation& bitrate) = 0;
+  // End to End media encryption.
+  virtual bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) = 0;
 };
 }  // namespace webrtc
 #endif  // CALL_VIDEO_RTP_SENDER_INTERFACE_H_

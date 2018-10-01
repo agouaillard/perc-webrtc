@@ -239,6 +239,9 @@ class VideoReceiveStream {
     EnableEncodedFrameRecording(rtc::kInvalidPlatformFileValue, 0);
   }
 
+  // End to End media encryption
+  virtual bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) = 0;
   // RtpDemuxer only forwards a given RTP packet to one sink. However, some
   // sinks, such as FlexFEC, might wish to be informed of all of the packets
   // a given sink receives (or any set of sinks). They may do so by registering

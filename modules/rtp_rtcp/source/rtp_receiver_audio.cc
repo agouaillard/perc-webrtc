@@ -163,7 +163,7 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
     size_t payload_length,
     const AudioPayload& audio_specific) {
   RTC_DCHECK_GE(payload_length, rtp_header->header.paddingLength);
-  const size_t payload_data_length =
+  size_t payload_data_length =
       payload_length - rtp_header->header.paddingLength;
   if (payload_data_length == 0) {
     rtp_header->frameType = kEmptyFrame;
@@ -233,6 +233,13 @@ int32_t RTPReceiverAudio::ParseAudioCodecSpecific(
         return 0;
       }
     }
+  }
+
+  if (media_crypto_) {
+    if (!media_crypto_->Decrypt(cricket::MediaType::MEDIA_TYPE_AUDIO,
+                                rtp_header->header.ssrc,(uint8_t*)payload_data,
+                                &payload_data_length))
+      return -1;
   }
 
   return data_callback_->OnReceivedPayloadData(payload_data,

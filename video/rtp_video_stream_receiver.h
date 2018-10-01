@@ -139,6 +139,9 @@ class RtpVideoStreamReceiver : public RtpData,
   void AddSecondarySink(RtpPacketSinkInterface* sink);
   void RemoveSecondarySink(const RtpPacketSinkInterface* sink);
 
+  // End to end media crypto.
+  bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+
  private:
   void ReceivePacket(const uint8_t* packet,
                      size_t packet_length,

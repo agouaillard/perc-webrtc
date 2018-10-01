@@ -120,6 +120,9 @@ class ChannelProxy : public RtpPacketSinkInterface {
   virtual void StopSend();
   virtual void StartPlayout();
   virtual void StopPlayout();
+  // End to end media crypto.
+  virtual bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
 
  private:
   // Thread checkers document and lock usage of some methods on voe::Channel to

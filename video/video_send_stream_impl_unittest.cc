@@ -70,6 +70,8 @@ class MockPayloadRouter : public VideoRtpSenderInterface {
                EncodedImageCallback::Result(const EncodedImage&,
                                             const CodecSpecificInfo*,
                                             const RTPFragmentationHeader*));
+  MOCK_METHOD1(SetMediaCrypto,
+               bool(const std::shared_ptr<webrtc::MediaCrypto>&));
 };
 }  // namespace
 

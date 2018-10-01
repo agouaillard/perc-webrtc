@@ -471,5 +471,10 @@ bool VideoReceiveStream::Decode() {
   }
   return true;
 }
+
+bool VideoReceiveStream::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  return rtp_video_stream_receiver_.SetMediaCrypto(media_crypto);
+}
 }  // namespace internal
 }  // namespace webrtc

@@ -687,6 +687,7 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
     SdpSemantics sdp_semantics;
     absl::optional<rtc::AdapterType> network_preference;
     bool active_reset_srtp_params;
+    std::shared_ptr<webrtc::MediaCrypto> media_crypto;
   };
   static_assert(sizeof(stuff_being_tested_for_equality) == sizeof(*this),
                 "Did you add something to RTCConfiguration and forget to "
@@ -734,7 +735,8 @@ bool PeerConnectionInterface::RTCConfiguration::operator==(
          turn_customizer == o.turn_customizer &&
          sdp_semantics == o.sdp_semantics &&
          network_preference == o.network_preference &&
-         active_reset_srtp_params == o.active_reset_srtp_params;
+         active_reset_srtp_params == o.active_reset_srtp_params  &&
+         media_crypto == o.media_crypto;
 }
 
 bool PeerConnectionInterface::RTCConfiguration::operator!=(
@@ -885,6 +887,12 @@ bool PeerConnection::Initialize(
   if (!config_error.ok()) {
     RTC_LOG(LS_ERROR) << "Invalid configuration: " << config_error.message();
     return false;
+  }
+
+  // Check E2E media crypto key
+  if (configuration.media_crypto) {
+    RTC_LOG(LS_INFO) << "Enabling E2E Media Encryption with";
+    media_crypto_ = configuration.media_crypto;
   }
 
   if (!dependencies.allocator) {
@@ -5562,6 +5570,9 @@ cricket::VoiceChannel* PeerConnection::CreateVoiceChannel(
   if (uma_observer_) {
     voice_channel->SetMetricsObserver(uma_observer_);
   }
+  if (media_crypto_) {
+    voice_channel->SetMediaCrypto(media_crypto_);
+  }
 
   return voice_channel;
 }
@@ -5586,6 +5597,9 @@ cricket::VideoChannel* PeerConnection::CreateVideoChannel(
   video_channel->SetRtpTransport(rtp_transport);
   if (uma_observer_) {
     video_channel->SetMetricsObserver(uma_observer_);
+  }
+  if (media_crypto_) {
+    video_channel->SetMediaCrypto(media_crypto_);
   }
 
   return video_channel;

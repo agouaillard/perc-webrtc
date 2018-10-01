@@ -183,6 +183,9 @@ class BaseChannel : public rtc::MessageHandler,
   void SetMetricsObserver(
       rtc::scoped_refptr<webrtc::MetricsObserverInterface> metrics_observer);
 
+  // End to end media encryption.
+  bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+
  protected:
   virtual MediaChannel* media_channel() const { return media_channel_.get(); }
 

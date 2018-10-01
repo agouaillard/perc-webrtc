@@ -38,6 +38,15 @@ SrtpSession::~SrtpSession() {
   }
 }
 
+
+ bool SrtpSession::Init() {
+  return IncrementLibsrtpUsageCountAndMaybeInit();
+ }
+
+ void  SrtpSession::Terminate() {
+   DecrementLibsrtpUsageCountAndMaybeDeinit();
+ }
+
 bool SrtpSession::SetSend(int cs,
                           const uint8_t* key,
                           size_t len,

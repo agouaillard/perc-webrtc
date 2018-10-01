@@ -380,5 +380,10 @@ void AudioReceiveStream::ConfigureStream(AudioReceiveStream* stream,
 
   stream->config_ = new_config;
 }
+
+bool AudioReceiveStream::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  return channel_proxy_->SetMediaCrypto(media_crypto);
+}
 }  // namespace internal
 }  // namespace webrtc

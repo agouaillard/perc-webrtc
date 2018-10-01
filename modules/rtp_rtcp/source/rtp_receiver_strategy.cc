@@ -9,6 +9,7 @@
  */
 
 #include "modules/rtp_rtcp/source/rtp_receiver_strategy.h"
+#include "rtc_base/logging.h"
 
 #include <stdlib.h>
 
@@ -24,6 +25,14 @@ void RTPReceiverStrategy::CheckPayloadChanged(int8_t payload_type,
                                               bool* should_discard_changes) {
   // Default: Keep changes.
   *should_discard_changes = false;
+}
+
+bool RTPReceiverStrategy::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  RTC_LOG(LS_INFO) << "Setting End to End Media Encryption";
+  rtc::CritScope cs(&crit_sect_);
+  media_crypto_ = media_crypto;
+  return true;
 }
 
 }  // namespace webrtc

@@ -353,6 +353,15 @@ int BaseChannel::SetOption_n(SocketType type,
   return transport ? transport->SetOption(opt, value) : -1;
 }
 
+bool BaseChannel::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  if (!media_channel_)
+    return false;
+  // Set it on the media channel.
+  media_channel_->SetMediaCrypto(media_crypto);
+  return true;
+}
+
 void BaseChannel::OnWritableState(bool writable) {
   RTC_DCHECK(network_thread_->IsCurrent());
   if (writable) {

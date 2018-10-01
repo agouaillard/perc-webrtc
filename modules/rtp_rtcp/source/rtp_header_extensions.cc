@@ -471,7 +471,7 @@ size_t FrameMarking::ValueSize(const FrameMarks& frame_marks) {
   return IsScalable(frame_marks) ? 3 : 1;
 }
 
-bool FrameMarking::Write(uint8_t* data, const FrameMarks& frame_marks) {
+bool FrameMarking::Write(rtc::ArrayView<uint8_t> data, const FrameMarks& frame_marks) {
   data[0] = frame_marks.start_of_frame ? 0x80 : 0x00;
   data[0] |= frame_marks.end_of_frame ? 0x40 : 0x00;
   data[0] |= frame_marks.independent ? 0x20 : 0x00;

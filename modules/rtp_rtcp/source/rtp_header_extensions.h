@@ -201,7 +201,7 @@ class FrameMarking {
   static bool Parse(rtc::ArrayView<const uint8_t> data,
                     FrameMarks* frame_marks);
   static size_t ValueSize(const FrameMarks& frame_marks);
-  static bool Write(uint8_t* data, const FrameMarks& frame_marks);
+  static bool Write(rtc::ArrayView<uint8_t> data, const FrameMarks& frame_marks);
 
   static uint8_t CreateLayerId(const RTPVideoHeaderVP9& vp9);
 

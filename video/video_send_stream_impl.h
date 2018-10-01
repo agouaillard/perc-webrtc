@@ -94,6 +94,9 @@ class VideoSendStreamImpl : public webrtc::BitrateAllocatorObserver,
   void OnPacketFeedbackVector(
       const std::vector<PacketFeedback>& packet_feedback_vector) override;
 
+  // End to end media crypto.
+  bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+
  private:
   class CheckEncoderActivityTask;
 

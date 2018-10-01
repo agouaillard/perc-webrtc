@@ -61,6 +61,9 @@ class RTPReceiverStrategy {
                                    PayloadUnion* specific_payload,
                                    bool* should_discard_changes);
 
+  // End to end media encryption.
+  virtual bool SetMediaCrypto(const std::shared_ptr<webrtc::MediaCrypto>& media_crypto);
+
  protected:
   // The data callback is where we should send received payload data.
   // See ParseRtpPacket. This class does not claim ownership of the callback.
@@ -74,6 +77,9 @@ class RTPReceiverStrategy {
 
   rtc::CriticalSection crit_sect_;
   RtpData* data_callback_;
+
+  // End to end media encryption.
+  std::shared_ptr<webrtc::MediaCrypto> media_crypto_;
 };
 }  // namespace webrtc
 

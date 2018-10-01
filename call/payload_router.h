@@ -100,6 +100,10 @@ class PayloadRouter : public VideoRtpSenderInterface {
   void OnBitrateAllocationUpdated(
       const VideoBitrateAllocation& bitrate) override;
 
+  // End to end media crypto.
+  bool SetMediaCrypto(
+      const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) override;
+
  private:
   void UpdateModuleSendingState() RTC_EXCLUSIVE_LOCKS_REQUIRED(crit_);
   void ConfigureProtection(const RtpConfig& rtp_config);

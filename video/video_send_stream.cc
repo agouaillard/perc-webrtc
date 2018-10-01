@@ -205,6 +205,11 @@ void VideoSendStream::SetTransportOverhead(
   });
 }
 
+bool VideoSendStream::SetMediaCrypto(
+    const std::shared_ptr<webrtc::MediaCrypto>& media_crypto) {
+  return send_stream_->SetMediaCrypto(media_crypto);
+}
+
 bool VideoSendStream::DeliverRtcp(const uint8_t* packet, size_t length) {
   // Called on a network thread.
   return send_stream_->DeliverRtcp(packet, length);

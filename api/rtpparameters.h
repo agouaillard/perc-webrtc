@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "absl/types/optional.h"
+#include "api/mediacrypto.h"
 #include "api/mediatypes.h"
 
 namespace webrtc {
@@ -611,11 +612,15 @@ struct RtpParameters {
   DegradationPreference degradation_preference =
       DegradationPreference::BALANCED;
 
+  // End to end media encryption.
+  std::shared_ptr<webrtc::MediaCrypto> media_crypto;
+
   bool operator==(const RtpParameters& o) const {
     return mid == o.mid && codecs == o.codecs &&
            header_extensions == o.header_extensions &&
            encodings == o.encodings && rtcp == o.rtcp &&
-           degradation_preference == o.degradation_preference;
+           degradation_preference == o.degradation_preference &&
+           media_crypto == o.media_crypto;
   }
   bool operator!=(const RtpParameters& o) const { return !(*this == o); }
 };
