@@ -116,6 +116,12 @@ void FuzzOneInput(const uint8_t* data, size_t size) {
         break;
       }
     }
+      case kRtpExtensionFrameMarking: {
+          FrameMarks frame_marks;
+          packet.GetExtension<FrameMarking>(&frame_marks);
+          break;
+      }
+    }
   }
 }
 }  // namespace webrtc

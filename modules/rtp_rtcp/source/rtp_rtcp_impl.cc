@@ -52,6 +52,8 @@ RTPExtensionType StringToRtpExtensionType(const std::string& extension) {
     return kRtpExtensionVideoTiming;
   if (extension == RtpExtension::kMidUri)
     return kRtpExtensionMid;
+  if (extension == RtpExtension::kFrameMarkingUri)
+    return kRtpExtensionFrameMarking;
   RTC_NOTREACHED() << "Looking up unsupported RTP extension.";
   return kRtpExtensionNone;
 }
